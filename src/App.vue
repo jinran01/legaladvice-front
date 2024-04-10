@@ -1,30 +1,70 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <v-app>
+    <!-- 导航栏 -->
+    <TopNavBar :blogInfo="blogInfo"></TopNavBar>
+    <!-- 侧边导航栏 -->
+    <SideNavBar />
+    <v-main style="margin-bottom: 30px">
+      <router-view :key="$route.fullPath"/>
+    </v-main>
+    <Footer ></Footer>
+    <BackTop></BackTop>
+    <!-- 音乐播放器 -->
+    <!-- 聊天室 -->
+    <ChatRoom></ChatRoom>
+  </v-app>
 </template>
 
-<style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
 
-nav {
-  padding: 30px;
+import Footer from "@/components/layout/Footer";
+import TopNavBar from "@/components/layout/TopNavBar";
+import BackTop from "@/components/BackTop";
+import {onBeforeMount, onMounted, ref} from "vue";
+import store from "@/store";
+import {getHomeInfo} from "@/network/home";
+import {clickEffect} from "@/common/js/onClick"; //鼠标点击特效
+// import {snow} from "@/common/js/snow";
+import {ElMessage} from "element-plus";
+import SideNavBar from "@/components/layout/SideNavBar";
+import ChatRoom from "@/components/ChatRoom";
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
 
-    &.router-link-exact-active {
-      color: #42b983;
+export default {
+
+  name: 'App',
+  components: {
+    ChatRoom,
+    SideNavBar,
+    Footer,
+    TopNavBar,
+    BackTop
+  },
+  setup(){
+    let blogInfo = ref()
+    onBeforeMount(()=>{
+      getHomeInfo().then(res=>{
+        if (res.flag){
+          blogInfo.value = res.data
+          store.commit("setBlogInfo",res.data)
+          localStorage.setItem("blogInfo",JSON.stringify(res.data))
+        }else {
+          ElMessage({
+            type:'error',
+            message:'出错了'
+          })
+        }
+      })
+    })
+    return{
+      blogInfo,
     }
   }
+}
+</script>
+<style scoped lang="less">
+footer{
+  width: 100%;
+  padding: 0;
 }
 </style>
