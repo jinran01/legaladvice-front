@@ -5,3 +5,10 @@ export function getArticles() {
     url:'/articles'
   })
 }
+
+
+export function getArticleById(id) {
+  return request({
+    url:`/articles/${id}`
+  })
+}

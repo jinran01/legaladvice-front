@@ -259,6 +259,7 @@ import Clipboard from "clipboard";
 import markdownToHtml from "../../utils/markdown";
 import Comment from "../../components/Comment";
 import tocbot from "tocbot";
+import {getArticleById} from "@/network/article";
 export default {
   components: {
     Comment
@@ -300,7 +301,7 @@ export default {
     getArticle() {
       const that = this;
       //查询文章
-      this.axios.get("/api" + this.$route.path).then(({ data }) => {
+      this.axios.get("/api/" + this.$route.path).then(({ data }) => {
         document.title = data.data.articleTitle;
         //将markdown转换为Html
         this.article = data.data;
