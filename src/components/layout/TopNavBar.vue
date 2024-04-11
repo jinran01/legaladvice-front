@@ -2,11 +2,11 @@
   <v-app-bar app :class="`${navClass} ${flag?'fade_in':'fade_out'}`" flat height="60">
     <!-- 手机端导航栏 -->
     <div class="d-md-none nav-mobile-container">
-      <div style="font-size:18px;font-weight:bold">
-        <router-link to="/">
-          {{ blogInfo.websiteConfig.websiteAuthor }}
-        </router-link>
-      </div>
+<!--      <div style="font-size:18px;font-weight:bold">-->
+<!--        <router-link to="/">-->
+<!--          {{ blogInfo.websiteConfig.websiteAuthor }}-->
+<!--        </router-link>-->
+<!--      </div>-->
       <div style="margin-left:auto">
         <a @click="openSearch"><i class="iconfont iconsousuo"/></a>
         <a @click="openDrawer" style="margin-left:10px;font-size:20px">
@@ -151,7 +151,7 @@
 
 <script>
 import store from "@/store";
-import {computed, reactive, ref, toRefs, watch} from "vue";
+import {computed, onMounted, reactive, ref, toRefs, watch} from "vue";
 
 export default {
   name: "ToNavBar",

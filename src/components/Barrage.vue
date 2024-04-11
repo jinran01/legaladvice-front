@@ -62,7 +62,7 @@ class Bullet {
   id
   status = 'waiting'
   nickname = '游客'
-  avatar = 'https://spring-boot-blog-api.oss-cn-hangzhou.aliyuncs.com/config/messageAvatar.png'
+  avatar = 'https://legaladvice.oss-cn-beijing.aliyuncs.com/default/6153b72a-4530-4367-a647-f3b0bcb677ec.jpg'
   content = ''
   color = ''
   track
@@ -113,7 +113,7 @@ export default {
       let data = {}
       //TODO 用户数据
       data.messageContent = messageContent.value
-      data.avatar = 'https://spring-boot-blog-api.oss-cn-hangzhou.aliyuncs.com/config/messageAvatar.png'
+      data.avatar = 'https://legaladvice.oss-cn-beijing.aliyuncs.com/default/db0d7c24-c3a9-4059-b732-deed38246631.png'
       data.nickname = '游客'
       data.time = 9
       // toast.show = true

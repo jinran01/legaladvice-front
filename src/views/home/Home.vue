@@ -263,6 +263,7 @@ export default {
     })
     const getArticleList = () => {
       getArticles().then(res => {
+        console.log(res)
         let md = require("markdown-it")();
         if (res.flag) {
           res.data.forEach(item => {
