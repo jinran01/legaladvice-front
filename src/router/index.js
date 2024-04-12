@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 
 const Home = () => import("@/views/home/Home")
 const Message = () => import("@/views/message/Message")
+const Article = () => import("@/views/article/Article")
 
 const routes = [
   {
@@ -10,8 +11,8 @@ const routes = [
     component: Home
   },
   {
-    path: "/articles/:articleId",
-    // component: resolve => require(["../views/article/Article.vue"], resolve)
+    path: "/articles/:id",
+    component: Article
   },
   {
     path: "/archives",

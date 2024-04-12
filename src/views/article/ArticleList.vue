@@ -86,6 +86,7 @@ export default {
   },
   methods: {
     infiniteHandler($state) {
+      console.log($state)
       this.axios
         .get("/api/articles/condition", {
           params: {

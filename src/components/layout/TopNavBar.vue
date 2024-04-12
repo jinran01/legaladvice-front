@@ -118,31 +118,30 @@
           </router-link>
         </div>
         <div class="menus-item">
-          <a
-              class="menu-btn"
-              v-if="!this.$store.state.avatar"
-              @click="openLogin"
-          >
-            <i class="iconfont icondenglu"/> 登录
-          </a>
-          <template v-else>
-            <img
-                class="user-avatar"
-                :src="this.$store.state.avatar"
-                height="30"
-                width="30"
-            />
-            <ul class="menus-submenu">
-              <li>
-                <router-link to="/user">
-                  <i class="iconfont icongerenzhongxin"/> 个人中心
-                </router-link>
-              </li>
-              <li>
-                <a @click="logout"><i class="iconfont icontuichu"/> 退出</a>
-              </li>
-            </ul>
-          </template>
+<!--          <a-->
+<!--              class="menu-btn"-->
+<!--              v-if="!state.avatar"-->
+<!--              @click="openLogin"-->
+<!--          >-->
+<!--            <i class="iconfont icondenglu"/> 登录-->
+<!--          </a>-->
+<!--          <template v-else>-->
+<!--            <img-->
+<!--                class="user-avatar"-->
+<!--                height="30"-->
+<!--                width="30"-->
+<!--            />-->
+<!--            <ul class="menus-submenu">-->
+<!--              <li>-->
+<!--                <router-link to="/user">-->
+<!--                  <i class="iconfont icongerenzhongxin"/> 个人中心-->
+<!--                </router-link>-->
+<!--              </li>-->
+<!--              <li>-->
+<!--                <a @click="logout"><i class="iconfont icontuichu"/> 退出</a>-->
+<!--              </li>-->
+<!--            </ul>-->
+<!--          </template>-->
         </div>
       </div>
     </div>

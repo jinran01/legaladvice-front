@@ -23,7 +23,6 @@ import {loadFonts} from './plugins/webfontloader'
 loadFonts()
 const app = createApp(App)
 app.use(router)
-    .use(store)
     .use(vuetify)
     .use(ElementPlus)
     .mount('#app')
