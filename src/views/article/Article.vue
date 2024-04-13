@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 封面图 -->
-    <div class="banner" :style="articleCover">
+    <div class="banner" :style="articleCover" >
       <div class="article-info-container">
         <!-- 文章标题 -->
         <div class="article-title">{{ article.articleTitle }}</div>
@@ -10,7 +10,7 @@
             <!-- 发表时间 -->
             <span>
               <i class="iconfont iconrili"/>
-              发表于 {{ article.createTime | date }}
+              发表于 {{ formatDate(article.createTime,"YYYY-MM-dd")}}
             </span>
             <span class="separator">|</span>
             <!-- 发表时间 -->
@@ -18,10 +18,10 @@
               <i class="iconfont icongengxinshijian"/>
               更新于
               <template v-if="article.updateTime">
-                {{ article.updateTime | date }}
+                {{ formatDate(article.updateTime,"YYYY-MM-dd") }}
               </template>
               <template v-else>
-                {{ article.createTime | date }}
+                {{ formatDate(article.createTime,"YYYY-MM-dd") }}
               </template>
             </span>
             <span class="separator">|</span>
@@ -69,7 +69,7 @@
               id="write"
               class="article-content markdown-body"
               v-html="article.articleContent"
-              ref="article"
+              ref="articleRef"
           />
           <!-- 版权声明 -->
           <div class="aritcle-copyright">
@@ -105,7 +105,7 @@
                 {{ item.tagName }}
               </router-link>
             </div>
-            <share style="margin-left:auto" :config="config"/>
+            <Share style="float: right"></Share>
           </div>
           <!-- 点赞打赏等 -->
           <div class="article-reward">
@@ -117,29 +117,29 @@
                   article.likeCount
                 }}</span>
             </a>
-            <a class="reward-btn" v-if="blogInfo.websiteConfig.isReward == 1">
-              <!-- 打赏按钮 -->
-              <i class="iconfont iconerweima"/> 打赏
-              <!-- 二维码 -->
-              <div class="animated fadeInDown reward-main">
-                <ul class="reward-all">
-                  <li class="reward-item">
-                    <img
-                        class="reward-img"
-                        :src="blogInfo.websiteConfig.weiXinQRCode"
-                    />
-                    <div class="reward-desc">微信</div>
-                  </li>
-                  <li class="reward-item">
-                    <img
-                        class="reward-img"
-                        :src="blogInfo.websiteConfig.alipayQRCode"
-                    />
-                    <div class="reward-desc">支付宝</div>
-                  </li>
-                </ul>
-              </div>
-            </a>
+<!--            <a class="reward-btn" v-if="blogInfo.websiteConfig.isReward == 1">-->
+<!--              &lt;!&ndash; 打赏按钮 &ndash;&gt;-->
+<!--              <i class="iconfont iconerweima"/> 打赏-->
+<!--              &lt;!&ndash; 二维码 &ndash;&gt;-->
+<!--              <div class="animated fadeInDown reward-main">-->
+<!--                <ul class="reward-all">-->
+<!--                  <li class="reward-item">-->
+<!--                    <img-->
+<!--                        class="reward-img"-->
+<!--                        :src="blogInfo.websiteConfig.weiXinQRCode"-->
+<!--                    />-->
+<!--                    <div class="reward-desc">微信</div>-->
+<!--                  </li>-->
+<!--                  <li class="reward-item">-->
+<!--                    <img-->
+<!--                        class="reward-img"-->
+<!--                        :src="blogInfo.websiteConfig.alipayQRCode"-->
+<!--                    />-->
+<!--                    <div class="reward-desc">支付宝</div>-->
+<!--                  </li>-->
+<!--                </ul>-->
+<!--              </div>-->
+<!--            </a>-->
           </div>
           <div class="pagination-post">
             <!-- 上一篇 -->
@@ -199,7 +199,7 @@
                   <div class="recommend-info">
                     <div class="recommend-date">
                       <i class="iconfont iconrili"/>
-                      {{ item.createTime | date }}
+                      {{ formatDate(item.createTime,"YYYY-MM-dd") }}
                     </div>
                     <div>{{ item.articleTitle }}</div>
                   </div>
@@ -222,7 +222,7 @@
               <i class="iconfont iconhanbao" style="font-size:16.8px"/>
               <span style="margin-left:10px">目录</span>
             </div>
-            <div id="toc"/>
+            <div id="toc" class="toc"/>
           </v-card>
           <!-- 最新文章 -->
           <v-card class="right-container" style="margin-top:20px">
@@ -245,7 +245,7 @@
                       {{ item.articleTitle }}
                     </router-link>
                   </div>
-                  <div class="content-time">{{ item.createTime | date }}</div>
+                  <div class="content-time">{{ formatDate(article.createTime,"YYYY-MM-dd") }}</div>
                 </div>
               </div>
             </div>
@@ -262,17 +262,25 @@ import markdownToHtml from "../../utils/markdown";
 import Comment from "../../components/Comment";
 import tocbot from "tocbot";
 import {getArticleById} from "@/network/article";
-import {computed, onMounted, reactive, ref, toRefs} from "vue";
+import {computed, nextTick, onMounted, reactive, ref, toRefs} from "vue";
 import store from "@/store";
-import {useRoute, useRouter} from "vue-router";
+import {useRoute} from "vue-router";
+import {ElMessage} from "element-plus";
+import {ImagePreview} from "vant";
+import state from "@/store/state";
+import {Share} from "vue3-social-share";
+import {formatDate} from "@/common/js/formatDate";
 
 export default {
+  methods: {formatDate},
   components: {
-    Comment
+    Share,
+    Comment,
   },
   setup() {
+    let articleRef = ref()
     let router = useRoute()
-    let imgList = ref([])
+    let imgUrlList = ref([])
     let article = reactive({
       nextArticle: {
         id: 0,
@@ -296,18 +304,96 @@ export default {
     let blogInfo = computed(()=>{
       return store.state.blogInfo
     })
-    //     config: {
-    //       sites: ["qzone", "wechat", "weibo", "qq"]
-    //     },
+    let isLike = computed(()=>{
+      let articleLikeSet = state.articleLikeSet;
+      return articleLikeSet.indexOf(article.id) != -1
+        ? "like-btn-active"
+        : "like-btn";
+    })
+    let isFull = computed(()=>{
+      return function (id) {
+        return id ? "post full" : "post";
+      }
+    })
+    let articleCover = computed(()=>{
+      return (
+        "background: url(" +
+          article.articleCover +
+        ") center center / cover no-repeat"
+      );
+    })
+    const deleteHTMLTag = (content)=> {
+      return content
+        .replace(/<\/?[^>]*>/g, "")
+        .replace(/[|]*\n/, "")
+        .replace(/&npsp;/gi, "");
+    }
     const getArticle = () => {
       getArticleById(router.params.id).then(res => {
         if (res.flag){
-
+          document.title = res.data.articleTitle;
+          article.articleContent = res.data.articleContent
+          article.articleCover = res.data.articleCover
+          article.articleTitle = res.data.articleTitle
+          article.tagDTOList = res.data.tagDTOList
+          article.viewsCount = res.data.viewsCount
+          article.createTime = res.data.createTime
+          article.updateTime = res.data.updateTime
+          article.categoryName = res.data.categoryName
+          article.newestArticleList = res.data.newestArticleList
+          article.recommendArticleList = res.data.recommendArticleList
+          article.lastArticle = res.data.lastArticle
+          article.nextArticle = res.data.nextArticle
+          article.articleContent = markdownToHtml(
+            res.data.articleContent
+          );
+          nextTick(()=>{
+            stat.wordNum = deleteHTMLTag(article.articleContent).length
+            stat.readTime = Math.round(stat.wordNum / 400) + "分钟";
+            const clipboard  = new Clipboard(".copy-btn")
+            clipboard.on('success',()=>{
+              ElMessage.success({message:"复制成功！"})
+            })
+            let nodes = articleRef.value.children
+            if (nodes.length) {
+              for (let i = 0; i < nodes.length; i++) {
+                let node = nodes[i];
+                let reg = /^H[1-4]{1}$/;
+                if (reg.exec(node.tagName)) {
+                  node.id = i;
+                }
+              }
+            }
+            tocbot.init({
+              tocSelector: ".toc", //要把目录添加元素位置，支持选择器
+              contentSelector: ".article-content", //获取html的元素
+              headingSelector: "h1, h2, h3", //要显示的id的目录
+              hasInnerContainers: true,
+              onClick: function(e) {
+                e.preventDefault();
+              }
+            });
+            let imgList = articleRef.value.getElementsByTagName("img");
+            for (var i = 0; i < imgList.length; i++) {
+              imgUrlList.value.push(imgList[i].src);
+              imgList[i].addEventListener("click", function(e) {
+                previewImg(e.target.currentSrc);
+              });
+            }
+            const previewImg = (img)=> {
+              ImagePreview({
+                images: [img],
+                closeable: true
+              })
+            }
+          })
         }else {
           ElMessage({
-
+            message: "出错了",
+            type: "error"
           })
         }
+
       })
     }
     onMounted(() => {
@@ -315,14 +401,15 @@ export default {
     })
     return{
       ...toRefs(stat),
-      imgList,
+      isFull,
+      articleCover,
+      articleRef,
+      isLike,
+      imgUrlList,
       article,
       blogInfo,
     }
   },
-  // created() {
-  //   this.getArticle();
-  // },
   // destroyed() {
   //   this.clipboard.destroy();
   //   tocbot.destroy();
@@ -556,7 +643,6 @@ export default {
     position: relative;
     display: inline-block;
     overflow: hidden;
-    margin: 3px;
     width: calc(100% - 4px);
     height: 150px;
     margin: 2px;
@@ -566,14 +652,18 @@ export default {
 }
 
 .article-operation {
+  margin: 25px;
   display: flex;
   align-items: center;
 }
 
 .article-category a {
+  margin-left: 5px;
   color: #fff !important;
 }
-
+.tag-container {
+  width: 50%;
+}
 .tag-container a {
   display: inline-block;
   margin: 0.5rem 0.5rem 0.5rem 0;
@@ -594,14 +684,15 @@ export default {
 
 .aritcle-copyright {
   position: relative;
-  margin-top: 40px;
-  margin-bottom: 10px;
+  margin: 40px 25px 10px;
   font-size: 0.875rem;
   line-height: 2;
   padding: 0.625rem 1rem;
   border: 1px solid #eee;
 }
-
+.article-content{
+  margin: 25px;
+}
 .aritcle-copyright span {
   color: #49b1f5;
   font-weight: bold;
@@ -820,7 +911,7 @@ hr {
 }
 
 .recommend-container {
-  margin-top: 40px;
+  margin: 40px 25px 25px;
 }
 
 .recommend-title {
@@ -1016,5 +1107,10 @@ pre.hljs {
     height: 24px;
     outline: none;
   }
+}
+.social-share{
+  width: 50%;
+  display: flex;
+  justify-content: end;
 }
 </style>

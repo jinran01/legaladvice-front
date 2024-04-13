@@ -66,7 +66,36 @@
 </template>
 
 <script>
+import {reactive, toRefs} from "vue";
+import {getArticlesList} from "@/network/article";
+import {useRoute} from "vue-router";
+
 export default {
+  setup(){
+    let stat = reactive({
+      current: 1,
+      size: 10,
+      articleList: [],
+      name: "",
+      title: ""
+    })
+    let route =useRoute()
+    const infiniteHandler = (a) => {
+      // console.log(a)
+      let data = {
+        categoryId: route.params.categoryId,
+        tagId: route.params.tagId,
+        current: stat.current
+      }
+      getArticlesList(data).then(res=>{
+        console.log(res)
+      })
+    }
+    return{
+      ...toRefs(stat),
+      infiniteHandler
+    }
+  },
   created() {
     const path = this.$route.path;
     if (path.indexOf("/categories") != -1) {
@@ -74,15 +103,6 @@ export default {
     } else {
       this.title = "标签";
     }
-  },
-  data: function() {
-    return {
-      current: 1,
-      size: 10,
-      articleList: [],
-      name: "",
-      title: ""
-    };
   },
   methods: {
     infiniteHandler($state) {

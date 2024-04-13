@@ -17,7 +17,9 @@ ul{
   min-width: 100%;
   padding: 20px !important;
 }
-
+.el-message{
+  display: flex;
+}
 .v-navigation-drawer,.v-toolbar{
   transition: all 0.5s;
 }
@@ -132,7 +134,7 @@ canvas {
 }
 
 p {
-  margin-bottom: 16px !important;
+  margin: 0 !important;
 }
 
 .login-container {
@@ -170,7 +172,7 @@ p {
   .article-container{
     animation: main 1s;
     max-width: 1200px;
-    margin: 372.5px auto 40px auto !important;
+    margin: 310px auto 40px auto !important;
     padding: 0 5px;
   }
   .article-wrapper{
@@ -206,7 +208,7 @@ p {
   }
   .article-container{
     animation: main 1s;
-    margin: 312.5px 0px 8px 0px !important;
+    margin: 310px 0px 8px 0px !important;
   }
   .article-wrapper{
     padding: 36px 14px;

@@ -134,9 +134,9 @@ canvas {
   }
 }
 
-p {
-  margin-bottom: 16px !important;
-}
+/*p {*/
+/*  margin-bottom: 16px !important;*/
+/*}*/
 
 .login-container {
   background: #fff !important;

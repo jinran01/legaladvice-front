@@ -46,7 +46,7 @@
       </div>
     </div>
     <!-- 主页文章 -->
-    <v-row class="home-container">
+    <v-row v-infinite-scroll="infiniteHandler" class="home-container">
       <v-col md="9" cols="12">
         <!-- 说说轮播 -->
         <v-card class="animated zoomIn" v-if="talkList.length > 0">
@@ -112,9 +112,9 @@
           </div>
         </v-card>
         <!-- 无限加载 -->
-        <!--        <infinite-loading @infinite="infiniteHandler">-->
-        <!--          <div slot="no-more"/>-->
-        <!--        </infinite-loading>-->
+<!--        <infinite-loading ref="infiniteLoadingRef" @infinite="infiniteHandler">-->
+<!--          <div slot="no-more"/>-->
+<!--        </infinite-loading>-->
       </v-col>
       <!-- 博主信息 -->
       <v-col md="3" cols="12" class="d-md-block d-none">
@@ -234,15 +234,14 @@ import EasyTyper from "easy-typer-js";
 import {onMounted, reactive, ref, toRefs} from "vue";
 import store from "@/store";
 
-import {getArticles} from "@/network/article";
+import {getArticles, getArticlesList} from "@/network/article";
 import {formatDate} from "@/common/js/formatDate";
-
-
 export default {
   components: {
     Swiper,
   },
   setup() {
+    let infiniteLoadingRef =ref()
     let tip = ref(false)
     let time = ref('')
     let obj = reactive({
@@ -255,26 +254,49 @@ export default {
       backSpeed: 40,
       sentencePause: true
     })
+
     let blogInfo = store.state.blogInfo
     let articleList = ref([])
     let talkList = ref([])
     let state = reactive({
       current: 1
     })
-    const getArticleList = () => {
-      getArticles().then(res => {
-        console.log(res)
+    // const getArticleList = () => {
+    //   getArticles().then(res => {
+    //     let md = require("markdown-it")();
+    //     if (res.flag) {
+    //       res.data.forEach(item => {
+    //         item.articleContent = md.render(item.articleContent)
+    //             .replace(/<\/?[^>]*>/g, "")
+    //             .replace(/[|]*\n/, "")
+    //             .replace(/&npsp;/gi, "");
+    //       })
+    //       articleList.value = res.data
+    //     }
+    //   })
+    // }
+    const infiniteHandler = () => {
+      getArticles({current:state.current}).then(res => {
         let md = require("markdown-it")();
         if (res.flag) {
           res.data.forEach(item => {
             item.articleContent = md.render(item.articleContent)
-                .replace(/<\/?[^>]*>/g, "")
-                .replace(/[|]*\n/, "")
-                .replace(/&npsp;/gi, "");
+              .replace(/<\/?[^>]*>/g, "")
+              .replace(/[|]*\n/, "")
+              .replace(/&npsp;/gi, "");
           })
-          articleList.value = res.data
+          articleList.value.push(...(res.data))
+          state.current = state.current + 1
         }
       })
+      // let data = {
+      //   categoryId: route.params.categoryId,
+      //   tagId: route.params.tagId,
+      //   current: stat.current
+      // }
+      // getArticlesList(data).then(res=>{
+      //   console.log(res)
+      // })
     }
     const isRight = (index) => {
       if (index % 2 == 0) {
@@ -325,7 +347,7 @@ export default {
     //TODO
     let cover = "background: url(" + "https://laravel-shop-api-y.oss-cn-hangzhou.aliyuncs.com/config/c822bd5bd73351ed057d59b5df5217f9.jpg" + ") center center / cover no-repeat";
     onMounted(() => {
-      getArticleList()
+      infiniteHandler()
       init()
       setInterval(runTime, 1000)
     })
@@ -334,10 +356,12 @@ export default {
       tip,
       time,
       obj,
+      infiniteHandler,
       articleList,
       talkList,
       blogInfo,
       cover,
+      infiniteLoadingRef,
       formatDate,
       isShowSocial,
       scrollDown,
@@ -431,19 +455,19 @@ export default {
 };
 </script>
 
-<style lang="stylus">
-.typed-cursor
-  opacity: 1
-  animation: blink 0.7s infinite
+<!--<style lang="stylus">-->
+<!--.typed-cursor-->
+<!--  opacity: 1-->
+<!--  animation: blink 0.7s infinite-->
 
-@keyframes blink
-  0%
-    opacity: 1
-  50%
-    opacity: 0
-  100%
-    opacity: 1
-</style>
+<!--@keyframes blink-->
+<!--  0%-->
+<!--    opacity: 1-->
+<!--  50%-->
+<!--    opacity: 0-->
+<!--  100%-->
+<!--    opacity: 1-->
+<!--</style>-->
 
 <style scoped lang="less">
 
