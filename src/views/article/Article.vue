@@ -117,29 +117,6 @@
                   article.likeCount
                 }}</span>
             </a>
-<!--            <a class="reward-btn" v-if="blogInfo.websiteConfig.isReward == 1">-->
-<!--              &lt;!&ndash; 打赏按钮 &ndash;&gt;-->
-<!--              <i class="iconfont iconerweima"/> 打赏-->
-<!--              &lt;!&ndash; 二维码 &ndash;&gt;-->
-<!--              <div class="animated fadeInDown reward-main">-->
-<!--                <ul class="reward-all">-->
-<!--                  <li class="reward-item">-->
-<!--                    <img-->
-<!--                        class="reward-img"-->
-<!--                        :src="blogInfo.websiteConfig.weiXinQRCode"-->
-<!--                    />-->
-<!--                    <div class="reward-desc">微信</div>-->
-<!--                  </li>-->
-<!--                  <li class="reward-item">-->
-<!--                    <img-->
-<!--                        class="reward-img"-->
-<!--                        :src="blogInfo.websiteConfig.alipayQRCode"-->
-<!--                    />-->
-<!--                    <div class="reward-desc">支付宝</div>-->
-<!--                  </li>-->
-<!--                </ul>-->
-<!--              </div>-->
-<!--            </a>-->
           </div>
           <div class="pagination-post">
             <!-- 上一篇 -->
@@ -210,7 +187,7 @@
           <!-- 分割线 -->
           <hr/>
           <!-- 评论 -->
-<!--          <comment :type="commentType" @getCommentCount="getCommentCount"/>-->
+          <comment :type="commentType" @getCommentCount="getCommentCount"/>
         </v-card>
       </v-col>
       <!-- 侧边功能 -->

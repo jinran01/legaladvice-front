@@ -1,6 +1,5 @@
 <template>
   <div class="main">
-
     <!-- banner -->
     <div class="home-banner" :style="cover">
       <div class="banner-container">
@@ -10,7 +9,8 @@
         </h1>
         <!-- 一言 -->
         <div class="blog-intro">
-          {{ obj.output }} <span class="typed-cursor">|</span>
+          {{ obj.output }}
+          <span class="typed-cursor">|</span>
         </div>
         <!-- 联系方式 -->
         <div class="blog-contact">
@@ -46,7 +46,7 @@
       </div>
     </div>
     <!-- 主页文章 -->
-    <v-row v-infinite-scroll="infiniteHandler" class="home-container">
+    <v-row v-infinite-scroll="infiniteHandler" :infinite-scroll-disabled="disabled" class="home-container">
       <v-col md="9" cols="12">
         <!-- 说说轮播 -->
         <v-card class="animated zoomIn" v-if="talkList.length > 0">
@@ -111,10 +111,7 @@
             </div>
           </div>
         </v-card>
-        <!-- 无限加载 -->
-<!--        <infinite-loading ref="infiniteLoadingRef" @infinite="infiniteHandler">-->
-<!--          <div slot="no-more"/>-->
-<!--        </infinite-loading>-->
+        <p class="loading"  v-if="loading">加载中...</p>
       </v-col>
       <!-- 博主信息 -->
       <v-col md="3" cols="12" class="d-md-block d-none">
@@ -231,7 +228,7 @@
 <script>
 import Swiper from "../../components/Swiper.vue";
 import EasyTyper from "easy-typer-js";
-import {onMounted, reactive, ref, toRefs} from "vue";
+import {computed, onMounted, reactive, ref, toRefs} from "vue";
 import store from "@/store";
 
 import {getArticles, getArticlesList} from "@/network/article";
@@ -254,12 +251,16 @@ export default {
       backSpeed: 40,
       sentencePause: true
     })
-
+    let loading = ref(false)
     let blogInfo = store.state.blogInfo
     let articleList = ref([])
     let talkList = ref([])
     let state = reactive({
       current: 1
+    })
+
+    let disabled = computed(()=>{
+      return loading.value
     })
     // const getArticleList = () => {
     //   getArticles().then(res => {
@@ -275,28 +276,32 @@ export default {
     //     }
     //   })
     // }
+    let flag = ref(true)
     const infiniteHandler = () => {
-      getArticles({current:state.current}).then(res => {
-        let md = require("markdown-it")();
-        if (res.flag) {
-          res.data.forEach(item => {
-            item.articleContent = md.render(item.articleContent)
-              .replace(/<\/?[^>]*>/g, "")
-              .replace(/[|]*\n/, "")
-              .replace(/&npsp;/gi, "");
-          })
-          articleList.value.push(...(res.data))
-          state.current = state.current + 1
-        }
-      })
-      // let data = {
-      //   categoryId: route.params.categoryId,
-      //   tagId: route.params.tagId,
-      //   current: stat.current
-      // }
-      // getArticlesList(data).then(res=>{
-      //   console.log(res)
-      // })
+      if (flag.value){
+        loading.value = true
+        getArticles({current:state.current,size:10}).then(res => {
+          let md = require("markdown-it")();
+          if (res.flag && res.data.length !== 0) {
+            res.data.forEach(item => {
+              item.articleContent = md.render(item.articleContent)
+                .replace(/<\/?[^>]*>/g, "")
+                .replace(/[|]*\n/, "")
+                .replace(/&npsp;/gi, "");
+            })
+            articleList.value.push(...(res.data))
+            state.current = state.current + 1
+            setTimeout(()=>{
+              loading.value = false
+            },2000)
+          }else {
+            setTimeout(()=>{
+              loading.value = false
+            },2000)
+            flag.value = false
+          }
+        })
+      }
     }
     const isRight = (index) => {
       if (index % 2 == 0) {
@@ -345,7 +350,8 @@ export default {
       time.value = str;
     }
     //TODO
-    let cover = "background: url(" + "https://laravel-shop-api-y.oss-cn-hangzhou.aliyuncs.com/config/c822bd5bd73351ed057d59b5df5217f9.jpg" + ") center center / cover no-repeat";
+    let cover = "background: url(" + "https://legaladvice.oss-cn-beijing.aliyuncs.com/page/homePage.jpg" + ") center center / cover no-repeat";
+
     onMounted(() => {
       infiniteHandler()
       init()
@@ -363,6 +369,8 @@ export default {
       cover,
       infiniteLoadingRef,
       formatDate,
+      disabled,
+      loading,
       isShowSocial,
       scrollDown,
       isRight,
@@ -768,5 +776,12 @@ export default {
     transform: scale(1.2);
   }
 }
-
+.loading{
+  font-size: 14px;
+  font-weight: bold;
+  padding-top: 12px;
+  display:flex;
+  justify-content: center;
+  color: #49b1f5
+}
 </style>

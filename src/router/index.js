@@ -3,6 +3,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 const Home = () => import("@/views/home/Home")
 const Message = () => import("@/views/message/Message")
 const Article = () => import("@/views/article/Article")
+const ArticleList = () => import("@/views/article/ArticleList")
 
 const routes = [
   {
@@ -55,14 +56,14 @@ const routes = [
   },
   {
     path: "/categories",
-    // component: resolve => require(["../views/category/Category.vue"], resolve),
+    component: resolve => require(["../views/category/Category.vue"], resolve),
     meta: {
       title: "分类"
     }
   },
   {
     path: "/categories/:categoryId",
-    // component: resolve => require(["../views/article/ArticleList.vue"], resolve)
+    component: resolve => require(["../views/article/ArticleList.vue"], resolve)
   },
   {
     path: "/tags/:tagId",

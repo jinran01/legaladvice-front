@@ -16,11 +16,11 @@
     </div>
     <!-- 电脑导航栏 -->
     <div class="d-md-block d-none nav-container">
-      <div class="float-left blog-title">
-        <router-link to="/">
-          Fiee、
-        </router-link>
-      </div>
+<!--      <div class="float-left blog-title">-->
+<!--        <router-link to="/">-->
+<!--          法律咨询与维权公益平台-->
+<!--        </router-link>-->
+<!--      </div>-->
       <div class="float-right nav-title">
         <div class="menus-item">
           <a class="menu-btn" @click="openSearch">
@@ -108,8 +108,8 @@
           </router-link>
         </div>
         <div class="menus-item">
-          <router-link class="menu-btn" to="/about">
-            <i class="iconfont iconzhifeiji"/> 关于
+          <router-link class="menu-btn" to="/lawyer">
+            <i class="iconfont iconbiaoqian"/> 律师
           </router-link>
         </div>
         <div class="menus-item">

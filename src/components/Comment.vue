@@ -6,12 +6,14 @@
       <div style="display:flex">
         <v-avatar size="40">
           <img
-            v-if="this.$store.state.avatar"
-            :src="this.$store.state.avatar"
+            style="width: 100%;"
+            v-if="state.avatar"
+            :src="state.avatar"
           />
           <img
+            style="width: 100%;"
             v-else
-            :src="this.$store.state.blogInfo.websiteConfig.touristAvatar"
+            :src="state.blogInfo.websiteConfig.touristAvatar"
           />
         </v-avatar>
         <div style="width:100%" class="ml-3">
@@ -202,212 +204,218 @@ import Reply from "./Reply";
 import Paging from "./Paging";
 import Emoji from "./Emoji";
 import EmojiList from "../assets/js/emoji";
+import state from "@/store/state";
 export default {
+  computed: {
+    state() {
+      return state
+    }
+  },
   components: {
     Reply,
     Emoji,
     Paging
   },
-  props: {
-    type: {
-      type: Number
-    }
-  },
-  created() {
-    this.listComments();
-  },
-  data: function() {
-    return {
-      reFresh: true,
-      commentContent: "",
-      chooseEmoji: false,
-      current: 1,
-      commentList: [],
-      count: 0
-    };
-  },
-  methods: {
-    replyComment(index, item) {
-      this.$refs.reply.forEach(item => {
-        item.$el.style.display = "none";
-      });
-      //传值给回复框
-      this.$refs.reply[index].commentContent = "";
-      this.$refs.reply[index].nickname = item.nickname;
-      this.$refs.reply[index].replyUserId = item.userId;
-      this.$refs.reply[index].parentId = this.commentList[index].id;
-      this.$refs.reply[index].chooseEmoji = false;
-      this.$refs.reply[index].index = index;
-      this.$refs.reply[index].$el.style.display = "block";
-    },
-    addEmoji(key) {
-      this.commentContent += key;
-    },
-    checkReplies(index, item) {
-      this.axios
-        .get("/api/comments/" + item.id + "/replies", {
-          params: { current: 1, size: 5 }
-        })
-        .then(({ data }) => {
-          this.$refs.check[index].style.display = "none";
-          item.replyDTOList = data.data;
-          //超过1页才显示分页
-          if (Math.ceil(item.replyCount / 5) > 1) {
-            this.$refs.paging[index].style.display = "flex";
-          }
-        });
-    },
-    changeReplyCurrent(current, index, commentId) {
-      //查看下一页回复
-      this.axios
-        .get("/api/comments/" + commentId + "/replies", {
-          params: { current: current, size: 5 }
-        })
-        .then(({ data }) => {
-          this.commentList[index].replyDTOList = data.data;
-        });
-    },
-    listComments() {
-      //查看评论
-      const path = this.$route.path;
-      const arr = path.split("/");
-      var param = {
-        current: this.current,
-        type: this.type
-      };
-      switch (this.type) {
-        case 1:
-        case 3:
-          param.topicId = arr[2];
-          break;
-        default:
-          break;
-      }
-      this.axios
-        .get("/api/comments", {
-          params: param
-        })
-        .then(({ data }) => {
-          if (this.current == 1) {
-            this.commentList = data.data.recordList;
-          } else {
-            this.commentList.push(...data.data.recordList);
-          }
-          this.current++;
-          this.count = data.data.count;
-          this.$emit("getCommentCount", this.count);
-        });
-    },
-    insertComment() {
-      //判断登录
-      if (!this.$store.state.userId) {
-        this.$store.state.loginFlag = true;
-        return false;
-      }
-      //判空
-      if (this.commentContent.trim() == "") {
-        this.$toast({ type: "error", message: "评论不能为空" });
-        return false;
-      }
-      //解析表情
-      var reg = /\[.+?\]/g;
-      this.commentContent = this.commentContent.replace(reg, function(str) {
-        return (
-          "<img src= '" +
-          EmojiList[str] +
-          "' width='24'height='24' style='margin: 0 1px;vertical-align: text-bottom'/>"
-        );
-      });
-      //发送请求
-      const path = this.$route.path;
-      const arr = path.split("/");
-      var comment = {
-        commentContent: this.commentContent,
-        type: this.type
-      };
-      switch (this.type) {
-        case 1:
-        case 3:
-          comment.topicId = arr[2];
-          break;
-        default:
-          break;
-      }
-      this.commentContent = "";
-      this.axios.post("/api/comments", comment).then(({ data }) => {
-        if (data.flag) {
-          // 查询最新评论
-          this.current = 1;
-          this.listComments();
-          const isReview = this.$store.state.blogInfo.websiteConfig
-            .isCommentReview;
-          if (isReview) {
-            this.$toast({ type: "warnning", message: "评论成功，正在审核中" });
-          } else {
-            this.$toast({ type: "success", message: "评论成功" });
-          }
-        } else {
-          this.$toast({ type: "error", message: data.message });
-        }
-      });
-    },
-    like(comment) {
-      // 判断登录
-      if (!this.$store.state.userId) {
-        this.$store.state.loginFlag = true;
-        return false;
-      }
-      // 发送请求
-      this.axios
-        .post("/api/comments/" + comment.id + "/like")
-        .then(({ data }) => {
-          if (data.flag) {
-            // 判断是否点赞
-            if (this.$store.state.commentLikeSet.indexOf(comment.id) != -1) {
-              this.$set(comment, "likeCount", comment.likeCount - 1);
-            } else {
-              this.$set(comment, "likeCount", comment.likeCount + 1);
-            }
-            this.$store.commit("commentLike", comment.id);
-          }
-        });
-    },
-    reloadReply(index) {
-      this.axios
-        .get("/api/comments/" + this.commentList[index].id + "/replies", {
-          params: {
-            current: this.$refs.page[index].current,
-            size: 5
-          }
-        })
-        .then(({ data }) => {
-          this.commentList[index].replyCount++;
-          //回复大于5条展示分页
-          if (this.commentList[index].replyCount > 5) {
-            this.$refs.paging[index].style.display = "flex";
-          }
-          this.$refs.check[index].style.display = "none";
-          this.$refs.reply[index].$el.style.display = "none";
-          this.commentList[index].replyDTOList = data.data;
-        });
-    }
-  },
-  computed: {
-    isLike() {
-      return function(commentId) {
-        var commentLikeSet = this.$store.state.commentLikeSet;
-        return commentLikeSet.indexOf(commentId) != -1 ? "like-active" : "like";
-      };
-    }
-  },
-  watch: {
-    commentList() {
-      this.reFresh = false;
-      this.$nextTick(() => {
-        this.reFresh = true;
-      });
-    }
-  }
+  // props: {
+  //   type: {
+  //     type: Number
+  //   }
+  // },
+  // created() {
+  //   this.listComments();
+  // },
+  // data: function() {
+  //   return {
+  //     reFresh: true,
+  //     commentContent: "",
+  //     chooseEmoji: false,
+  //     current: 1,
+  //     commentList: [],
+  //     count: 0
+  //   };
+  // },
+  // methods: {
+  //   replyComment(index, item) {
+  //     this.$refs.reply.forEach(item => {
+  //       item.$el.style.display = "none";
+  //     });
+  //     //传值给回复框
+  //     this.$refs.reply[index].commentContent = "";
+  //     this.$refs.reply[index].nickname = item.nickname;
+  //     this.$refs.reply[index].replyUserId = item.userId;
+  //     this.$refs.reply[index].parentId = this.commentList[index].id;
+  //     this.$refs.reply[index].chooseEmoji = false;
+  //     this.$refs.reply[index].index = index;
+  //     this.$refs.reply[index].$el.style.display = "block";
+  //   },
+  //   addEmoji(key) {
+  //     this.commentContent += key;
+  //   },
+  //   checkReplies(index, item) {
+  //     this.axios
+  //       .get("/api/comments/" + item.id + "/replies", {
+  //         params: { current: 1, size: 5 }
+  //       })
+  //       .then(({ data }) => {
+  //         this.$refs.check[index].style.display = "none";
+  //         item.replyDTOList = data.data;
+  //         //超过1页才显示分页
+  //         if (Math.ceil(item.replyCount / 5) > 1) {
+  //           this.$refs.paging[index].style.display = "flex";
+  //         }
+  //       });
+  //   },
+  //   changeReplyCurrent(current, index, commentId) {
+  //     //查看下一页回复
+  //     this.axios
+  //       .get("/api/comments/" + commentId + "/replies", {
+  //         params: { current: current, size: 5 }
+  //       })
+  //       .then(({ data }) => {
+  //         this.commentList[index].replyDTOList = data.data;
+  //       });
+  //   },
+  //   listComments() {
+  //     //查看评论
+  //     const path = this.$route.path;
+  //     const arr = path.split("/");
+  //     var param = {
+  //       current: this.current,
+  //       type: this.type
+  //     };
+  //     switch (this.type) {
+  //       case 1:
+  //       case 3:
+  //         param.topicId = arr[2];
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //     this.axios
+  //       .get("/api/comments", {
+  //         params: param
+  //       })
+  //       .then(({ data }) => {
+  //         if (this.current == 1) {
+  //           this.commentList = data.data.recordList;
+  //         } else {
+  //           this.commentList.push(...data.data.recordList);
+  //         }
+  //         this.current++;
+  //         this.count = data.data.count;
+  //         this.$emit("getCommentCount", this.count);
+  //       });
+  //   },
+  //   insertComment() {
+  //     //判断登录
+  //     if (!this.$store.state.userId) {
+  //       this.$store.state.loginFlag = true;
+  //       return false;
+  //     }
+  //     //判空
+  //     if (this.commentContent.trim() == "") {
+  //       this.$toast({ type: "error", message: "评论不能为空" });
+  //       return false;
+  //     }
+  //     //解析表情
+  //     var reg = /\[.+?\]/g;
+  //     this.commentContent = this.commentContent.replace(reg, function(str) {
+  //       return (
+  //         "<img src= '" +
+  //         EmojiList[str] +
+  //         "' width='24'height='24' style='margin: 0 1px;vertical-align: text-bottom'/>"
+  //       );
+  //     });
+  //     //发送请求
+  //     const path = this.$route.path;
+  //     const arr = path.split("/");
+  //     var comment = {
+  //       commentContent: this.commentContent,
+  //       type: this.type
+  //     };
+  //     switch (this.type) {
+  //       case 1:
+  //       case 3:
+  //         comment.topicId = arr[2];
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //     this.commentContent = "";
+  //     this.axios.post("/api/comments", comment).then(({ data }) => {
+  //       if (data.flag) {
+  //         // 查询最新评论
+  //         this.current = 1;
+  //         this.listComments();
+  //         const isReview = this.$store.state.blogInfo.websiteConfig
+  //           .isCommentReview;
+  //         if (isReview) {
+  //           this.$toast({ type: "warnning", message: "评论成功，正在审核中" });
+  //         } else {
+  //           this.$toast({ type: "success", message: "评论成功" });
+  //         }
+  //       } else {
+  //         this.$toast({ type: "error", message: data.message });
+  //       }
+  //     });
+  //   },
+  //   like(comment) {
+  //     // 判断登录
+  //     if (!this.$store.state.userId) {
+  //       this.$store.state.loginFlag = true;
+  //       return false;
+  //     }
+  //     // 发送请求
+  //     this.axios
+  //       .post("/api/comments/" + comment.id + "/like")
+  //       .then(({ data }) => {
+  //         if (data.flag) {
+  //           // 判断是否点赞
+  //           if (this.$store.state.commentLikeSet.indexOf(comment.id) != -1) {
+  //             this.$set(comment, "likeCount", comment.likeCount - 1);
+  //           } else {
+  //             this.$set(comment, "likeCount", comment.likeCount + 1);
+  //           }
+  //           this.$store.commit("commentLike", comment.id);
+  //         }
+  //       });
+  //   },
+  //   reloadReply(index) {
+  //     this.axios
+  //       .get("/api/comments/" + this.commentList[index].id + "/replies", {
+  //         params: {
+  //           current: this.$refs.page[index].current,
+  //           size: 5
+  //         }
+  //       })
+  //       .then(({ data }) => {
+  //         this.commentList[index].replyCount++;
+  //         //回复大于5条展示分页
+  //         if (this.commentList[index].replyCount > 5) {
+  //           this.$refs.paging[index].style.display = "flex";
+  //         }
+  //         this.$refs.check[index].style.display = "none";
+  //         this.$refs.reply[index].$el.style.display = "none";
+  //         this.commentList[index].replyDTOList = data.data;
+  //       });
+  //   }
+  // },
+  // computed: {
+  //   isLike() {
+  //     return function(commentId) {
+  //       var commentLikeSet = this.$store.state.commentLikeSet;
+  //       return commentLikeSet.indexOf(commentId) != -1 ? "like-active" : "like";
+  //     };
+  //   }
+  // },
+  // watch: {
+  //   commentList() {
+  //     this.reFresh = false;
+  //     this.$nextTick(() => {
+  //       this.reFresh = true;
+  //     });
+  //   }
+  // }
 };
 </script>
 
@@ -427,7 +435,7 @@ export default {
   font-size: 1.25rem;
   font-weight: bold;
   line-height: 40px;
-  margin-bottom: 10px;
+  margin: 25px 25px 10px;
 }
 .comment-title i {
   font-size: 1.5rem;
@@ -437,7 +445,7 @@ export default {
   border: 1px solid #90939950;
   border-radius: 4px;
   padding: 10px;
-  margin: 0 0 10px;
+  margin: 0 25px 10px;
 }
 .count {
   padding: 5px;
