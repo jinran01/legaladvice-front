@@ -9,9 +9,17 @@
     </v-main>
     <Footer ></Footer>
     <BackTop></BackTop>
+    <!-- 登录模态框 -->
+    <LoginModel></LoginModel>
+    <!-- 注册模态框 -->
+    <RegisterModel></RegisterModel>
+    <!-- 忘记密码模态框 -->
+<!--    <ForgetModel></ForgetModel>-->
     <!-- 音乐播放器 -->
+
     <!-- 聊天室 -->
     <ChatRoom></ChatRoom>
+
   </v-app>
 </template>
 
@@ -28,17 +36,23 @@ import {clickEffect} from "@/common/js/onClick"; //鼠标点击特效
 import {ElMessage} from "element-plus";
 import SideNavBar from "@/components/layout/SideNavBar";
 import ChatRoom from "@/components/ChatRoom";
+import LoginModel from "@/components/model/LoginModel.vue";
+import RegisterModel from "@/components/model/RegisterModel.vue";
+import ForgetModel from "@/components/model/ForgetModel.vue";
 
 
 export default {
 
   name: 'App',
   components: {
+    ForgetModel,
+    RegisterModel,
+    LoginModel,
     ChatRoom,
     SideNavBar,
     Footer,
     TopNavBar,
-    BackTop
+    BackTop,
   },
   setup(){
     let blogInfo = ref()
@@ -47,7 +61,6 @@ export default {
         if (res.flag){
           blogInfo.value = res.data
           store.commit("setBlogInfo",res.data)
-          localStorage.setItem("blogInfo",JSON.stringify(res.data))
         }else {
           ElMessage({
             type:'error',

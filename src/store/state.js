@@ -1,7 +1,21 @@
-const state = {
+let state = {
   drawer:false,
   scrollTop:0,
-  blogInfo: JSON.parse(localStorage.getItem("blogInfo")),
-  articleLikeSet:"",
+  blogInfo: "",
+  searchFlag: false,
+  loginFlag: false,
+  registerFlag: false,
+  forgetFlag: false,
+  emailFlag: false,
+  userId: null,
+  avatar: null,
+  nickname: null,
+  intro: null,
+  webSite: null,
+  loginType: null,
+  email: null,
+  articleLikeSet: [],
+  commentLikeSet: [],
+  talkLikeSet: [],
 }
 export default state;

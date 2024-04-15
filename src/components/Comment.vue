@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="comment-title"><i class="iconfont iconpinglunzu" />评论</div>
+    <div class="comment-title"><i class="iconfont iconpinglunzu"/>评论</div>
     <!-- 评论框 -->
     <div class="comment-input-wrapper">
       <div style="display:flex">
@@ -32,7 +32,7 @@
               :class="chooseEmoji ? 'emoji-btn-active' : 'emoji-btn'"
               @click="chooseEmoji = !chooseEmoji"
             >
-              <i class="iconfont iconbiaoqing" />
+              <i class="iconfont iconbiaoqing"/>
             </span>
             <button
               @click="insertComment"
@@ -43,12 +43,12 @@
             </button>
           </div>
           <!-- 表情框 -->
-          <emoji @addEmoji="addEmoji" :chooseEmoji="chooseEmoji" />
+          <emoji @addEmoji="addEmoji" :chooseEmoji="chooseEmoji"/>
         </div>
       </div>
     </div>
     <!-- 评论详情 -->
-    <div v-if="count > 0 && reFresh">
+    <div style="margin: 25px" v-if="count > 0 && reFresh">
       <!-- 评论数量 -->
       <div class="count">{{ count }} 评论</div>
       <!-- 评论列表 -->
@@ -60,7 +60,7 @@
       >
         <!-- 头像 -->
         <v-avatar size="40" class="comment-avatar">
-          <img :src="item.avatar" />
+          <img style="width: 100%" :src="item.avatar"/>
         </v-avatar>
         <div class="comment-meta">
           <!-- 用户名 -->
@@ -69,14 +69,14 @@
             <a v-else :href="item.webSite" target="_blank">
               {{ item.nickname }}
             </a>
-            <span class="blogger-tag" v-if="item.userId == 1">博主</span>
+            <span class="blogger-tag" v-if="item.userId == 1">管理员</span>
           </div>
           <!-- 信息 -->
           <div class="comment-info">
             <!-- 楼层 -->
             <span style="margin-right:10px">{{ count - index }}楼</span>
             <!-- 发表时间 -->
-            <span style="margin-right:10px">{{ item.createTime | date }}</span>
+            <span style="margin-right:10px">{{ formatDate(item.createTime,"YYYY-MM-dd") }}</span>
             <!-- 点赞 -->
             <span
               :class="isLike(item.id) + ' iconfont icondianzan'"
@@ -98,7 +98,7 @@
           >
             <!-- 头像 -->
             <v-avatar size="36" class="comment-avatar">
-              <img :src="reply.avatar" />
+              <img style="width: 100%" :src="reply.avatar"/>
             </v-avatar>
             <div class="reply-meta">
               <!-- 用户名 -->
@@ -143,7 +143,7 @@
                   </a>
                   ，
                 </template>
-                <span v-html="reply.commentContent" />
+                <span v-html="reply.commentContent"/>
               </p>
             </div>
           </div>
@@ -182,7 +182,7 @@
             />
           </div>
           <!-- 回复框 -->
-          <Reply :type="type" ref="reply" @reloadReply="reloadReply" />
+          <Reply :type="type" ref="reply" @reloadReply="reloadReply"/>
         </div>
       </div>
       <!-- 加载按钮 -->
@@ -205,7 +205,13 @@ import Paging from "./Paging";
 import Emoji from "./Emoji";
 import EmojiList from "../assets/js/emoji";
 import state from "@/store/state";
+import {computed, onMounted, reactive, toRefs} from "vue";
+import {useRoute} from "vue-router";
+import {commentLike, getCommentByTopicId} from "@/network/comment";
+import {formatDate} from "../common/js/formatDate";
+
 export default {
+  methods: {formatDate},
   computed: {
     state() {
       return state
@@ -216,24 +222,71 @@ export default {
     Emoji,
     Paging
   },
-  // props: {
-  //   type: {
-  //     type: Number
-  //   }
-  // },
-  // created() {
-  //   this.listComments();
-  // },
-  // data: function() {
-  //   return {
-  //     reFresh: true,
-  //     commentContent: "",
-  //     chooseEmoji: false,
-  //     current: 1,
-  //     commentList: [],
-  //     count: 0
-  //   };
-  // },
+  setup(props, context) {
+    let route = useRoute()
+    let stat = reactive({
+      reFresh: true,
+      commentContent: "",
+      chooseEmoji: false,
+      current: 1,
+      commentList: [],
+      count: 0,
+      type: 1
+    })
+    //获取改篇文章的评论
+    const listComments = () => {
+      //查看评论
+      const path = route.path;
+      const arr = path.split("/");
+      var param = {
+        current: stat.current,
+        type: stat.type
+      };
+      switch (stat.type) {
+        case 1:
+        case 3:
+          param.topicId = arr[2];
+          break;
+        default:
+          break;
+      }
+      getCommentByTopicId(param).then(res => {
+        if (stat.current == 1) {
+          stat.commentList = res.data.recordList;
+        } else {
+          stat.commentList.push(...res.data.recordList);
+        }
+        stat.current = stat.current + 1
+        stat.count = res.data.count
+        // context.emit("getCommentCount", state.count)
+      })
+    }
+    //点赞评论
+    const like = (item) => {
+      // 判断登录
+      if (state.userId) {
+        state.loginFlag = true;
+        return false;
+      }
+      commentLike(item.id).then(res=>{
+        console.log(res)
+      })
+    }
+    const isLike = computed(() => {
+      return function (commentId) {
+        var commentLikeSet = state.commentLikeSet;
+        return commentLikeSet.indexOf(commentId) != -1 ? "like-active" : "like";
+      };
+    })
+    onMounted(() => {
+      listComments()
+    })
+    return {
+      ...toRefs(stat),
+      isLike,
+      like,
+    }
+  }
   // methods: {
   //   replyComment(index, item) {
   //     this.$refs.reply.forEach(item => {
@@ -429,6 +482,7 @@ export default {
   padding: 0 5px;
   margin-left: 6px;
 }
+
 .comment-title {
   display: flex;
   align-items: center;
@@ -437,55 +491,66 @@ export default {
   line-height: 40px;
   margin: 25px 25px 10px;
 }
+
 .comment-title i {
   font-size: 1.5rem;
   margin-right: 5px;
 }
+
 .comment-input-wrapper {
   border: 1px solid #90939950;
   border-radius: 4px;
   padding: 10px;
   margin: 0 25px 10px;
 }
+
 .count {
   padding: 5px;
   line-height: 1.75;
   font-size: 1.25rem;
   font-weight: bold;
 }
+
 .comment-meta {
   margin-left: 0.8rem;
   width: 100%;
   border-bottom: 1px dashed #f5f5f5;
 }
+
 .reply-meta {
   margin-left: 0.8rem;
   width: 100%;
 }
+
 .comment-user {
   font-size: 14px;
   line-height: 1.75;
 }
+
 .comment-user a {
   color: #1abc9c !important;
   font-weight: 500;
   transition: 0.3s all;
 }
+
 .comment-nickname {
   text-decoration: none;
   color: #1abc9c !important;
   font-weight: 500;
 }
+
 .comment-info {
   line-height: 1.75;
   font-size: 0.75rem;
   color: #b3b3b3;
 }
+
 .reply-btn {
   cursor: pointer;
   float: right;
   color: #ef2f11;
 }
+
 .comment-content {
   font-size: 0.875rem;
   line-height: 1.75;
@@ -494,30 +559,37 @@ export default {
   word-wrap: break-word;
   word-break: break-all;
 }
+
 .comment-avatar {
   transition: all 0.5s;
 }
+
 .comment-avatar:hover {
   transform: rotate(360deg);
 }
+
 .like {
   cursor: pointer;
   font-size: 0.875rem;
 }
+
 .like:hover {
   color: #eb5055;
 }
+
 .like-active {
   cursor: pointer;
   font-size: 0.875rem;
   color: #eb5055;
 }
+
 .load-wrapper {
   margin-top: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .load-wrapper button {
   background-color: #49b1f5;
   color: #fff;

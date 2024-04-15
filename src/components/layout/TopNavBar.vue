@@ -2,11 +2,11 @@
   <v-app-bar app :class="`${navClass} ${flag?'fade_in':'fade_out'}`" flat height="60">
     <!-- 手机端导航栏 -->
     <div class="d-md-none nav-mobile-container">
-<!--      <div style="font-size:18px;font-weight:bold">-->
-<!--        <router-link to="/">-->
-<!--          {{ blogInfo.websiteConfig.websiteAuthor }}-->
-<!--        </router-link>-->
-<!--      </div>-->
+      <!--      <div style="font-size:18px;font-weight:bold">-->
+      <!--        <router-link to="/">-->
+      <!--          {{ blogInfo.websiteConfig.websiteAuthor }}-->
+      <!--        </router-link>-->
+      <!--      </div>-->
       <div style="margin-left:auto">
         <a @click="openSearch"><i class="iconfont iconsousuo"/></a>
         <a @click="openDrawer" style="margin-left:10px;font-size:20px">
@@ -16,11 +16,11 @@
     </div>
     <!-- 电脑导航栏 -->
     <div class="d-md-block d-none nav-container">
-<!--      <div class="float-left blog-title">-->
-<!--        <router-link to="/">-->
-<!--          法律咨询与维权公益平台-->
-<!--        </router-link>-->
-<!--      </div>-->
+      <!--      <div class="float-left blog-title">-->
+      <!--        <router-link to="/">-->
+      <!--          法律咨询与维权公益平台-->
+      <!--        </router-link>-->
+      <!--      </div>-->
       <div class="float-right nav-title">
         <div class="menus-item">
           <a class="menu-btn" @click="openSearch">
@@ -34,12 +34,12 @@
         </div>
         <div class="menus-item">
           <v-menu
-              open-on-hover
+            open-on-hover
           >
             <template #activator="{ props }">
               <a
-                  color="primary"
-                  v-bind="props"
+                color="primary"
+                v-bind="props"
               >
                 <i class="iconfont iconfaxian"/> 发现
                 <i class="iconfont iconxiangxia2 expand"/>
@@ -71,19 +71,13 @@
           </v-menu>
         </div>
         <div class="menus-item">
-          <v-menu
-              open-on-hover
-          >
+          <v-menu open-on-hover>
             <template #activator="{ props }">
-              <a
-                  color="primary"
-                  v-bind="props"
-              >
+              <a color="primary" v-bind="props">
                 <i class="iconfont iconqita"/> 娱乐
                 <i class="iconfont iconxiangxia2 expand"/>
               </a>
             </template>
-
             <v-list>
               <v-list-item>
                 <v-list-item-title>
@@ -118,30 +112,43 @@
           </router-link>
         </div>
         <div class="menus-item">
-<!--          <a-->
-<!--              class="menu-btn"-->
-<!--              v-if="!state.avatar"-->
-<!--              @click="openLogin"-->
-<!--          >-->
-<!--            <i class="iconfont icondenglu"/> 登录-->
-<!--          </a>-->
-<!--          <template v-else>-->
-<!--            <img-->
-<!--                class="user-avatar"-->
-<!--                height="30"-->
-<!--                width="30"-->
-<!--            />-->
-<!--            <ul class="menus-submenu">-->
-<!--              <li>-->
-<!--                <router-link to="/user">-->
-<!--                  <i class="iconfont icongerenzhongxin"/> 个人中心-->
-<!--                </router-link>-->
-<!--              </li>-->
-<!--              <li>-->
-<!--                <a @click="logout"><i class="iconfont icontuichu"/> 退出</a>-->
-<!--              </li>-->
-<!--            </ul>-->
-<!--          </template>-->
+          <a
+            class="menu-btn"
+            v-if="!store.state.avatar"
+            @click="openLogin"
+          >
+            <i class="iconfont icondenglu"/> 登录
+          </a>
+          <v-menu open-on-hover v-else>
+            <template #activator="{props}">
+              <img
+                v-bind="props"
+                class="user-avatar"
+                height="30"
+                width="30"
+                :src="store.state.avatar"
+                alt=""/>
+            </template>
+            <v-list>
+              <v-list-item>
+                <v-list-item-title>
+                  <router-link to="/setting" style="color: #4c4948">
+                    <i class="iconfont icongerenzhongxin"/> 个人中心
+                  </router-link>
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title style="cursor: pointer" @click="logout">
+                  <i class="iconfont icondenglu"/> 律师认证
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title style="cursor: pointer" @click="logout">
+                  <i class="iconfont icontuichu"/> 退出
+                </v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </div>
       </div>
     </div>
@@ -151,9 +158,21 @@
 <script>
 import store from "@/store";
 import {computed, onMounted, reactive, ref, toRefs, watch} from "vue";
+import state from "@/store/state";
+import {homeLogout} from "@/network/login";
+import {ElMessage} from "element-plus";
+import router from "@/router";
 
 export default {
   name: "ToNavBar",
+  computed: {
+    store() {
+      return store
+    },
+    state() {
+      return state
+    }
+  },
   props: {
     blogInfo: {
       type: Object,
@@ -163,9 +182,30 @@ export default {
     let navClass = ref('nav')
     let flag = ref(false)
     let blogInfo = store.state.blogInfo || props.blogInfo
-    let state = reactive({
-      scrollTop: 0
+    // let state = reactive({
+    //   scrollTop: 0
+    // })
+    const openLogin = () => {
+      store.commit("setLoginFlag", !state.loginFlag)
+    }
+    let test = computed(() => {
+      return state.loginFlag
     })
+    watch(test, (a, b) => {
+      console.log(a, b)
+    })
+    //退出
+    const logout = () => {
+      homeLogout().then(res=>{
+        if (res.flag){
+          store.commit("logout")
+          ElMessage.success("注销成功！！！")
+          router.push("/")
+        }else {
+          ElMessage.error("出错了！请联系管理人员！")
+        }
+      })
+    }
     //开启搜索框
     const openSearch = () => {
 
@@ -197,6 +237,8 @@ export default {
       navClass,
       blogInfo,
       flag,
+      logout,
+      openLogin,
       openSearch,
       openDrawer,
     }

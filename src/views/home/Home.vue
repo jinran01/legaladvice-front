@@ -316,7 +316,6 @@ export default {
       });
     }
     const init = () => {
-      //TODO
       // document.title = blogInfo.websiteConfig.websiteName;
       // 一言Api进行打字机循环输出效果
       fetch("https://v1.hitokoto.cn?c=i")
@@ -349,10 +348,15 @@ export default {
       str += day.getSeconds() + "秒";
       time.value = str;
     }
-    //TODO
-    let cover = "background: url(" + "https://legaladvice.oss-cn-beijing.aliyuncs.com/page/homePage.jpg" + ") center center / cover no-repeat";
 
+    let cover = ref("")
     onMounted(() => {
+      let pageList = store.state.blogInfo.pageList
+      for (let i = 0; i < pageList.length; i++) {
+        if (pageList[i].pageName == "首页"){
+          cover.value = "background: url(" + pageList[i].pageCover + ") center center / cover no-repeat";
+        }
+      }
       infiniteHandler()
       init()
       setInterval(runTime, 1000)

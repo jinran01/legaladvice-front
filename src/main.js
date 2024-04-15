@@ -1,4 +1,4 @@
-import {createApp,h} from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
 import router from './router'
 
@@ -16,15 +16,18 @@ import ElementPlus from 'element-plus'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/theme-chalk/index.css';
 import vuetify from './plugins/vuetify'
-
+import {createPinia} from "pinia";
+import store from "./store"
 import {loadFonts} from './plugins/webfontloader'
 loadFonts()
 const app = createApp(App)
-
+const pinia = createPinia()
 app.use(router)
     .use(ElementPlus,)
     .use(vuetify)
     .use(Icon)
+    .use(pinia)
+    .use(store)
     .use(Share)
     .mount('#app')
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
