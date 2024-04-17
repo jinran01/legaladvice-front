@@ -13,7 +13,7 @@
           <img
             style="width: 100%;"
             v-else
-            :src="state.blogInfo.websiteConfig.touristAvatar"
+            :src="store.state.blogInfo.websiteConfig.touristAvatar"
           />
         </v-avatar>
         <div style="width:100%" class="ml-3">
@@ -209,10 +209,14 @@ import {computed, onMounted, reactive, toRefs} from "vue";
 import {useRoute} from "vue-router";
 import {commentLike, getCommentByTopicId} from "@/network/comment";
 import {formatDate} from "../common/js/formatDate";
+import store from "@/store";
 
 export default {
   methods: {formatDate},
   computed: {
+    store() {
+      return store
+    },
     state() {
       return state
     }

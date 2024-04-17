@@ -13,3 +13,11 @@ export function homeLogout(){
         url:'/logout',
     })
 }
+
+export function registerUser(data){
+    return request({
+        url:'/system/user/register',
+        method: "POST",
+        data
+    })
+}

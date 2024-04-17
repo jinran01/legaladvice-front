@@ -28,11 +28,9 @@
 import Footer from "@/components/layout/Footer";
 import TopNavBar from "@/components/layout/TopNavBar";
 import BackTop from "@/components/BackTop";
-import {onBeforeMount, onMounted, ref} from "vue";
+import {onBeforeMount, ref} from "vue";
 import store from "@/store";
 import {getHomeInfo} from "@/network/home";
-import {clickEffect} from "@/common/js/onClick"; //鼠标点击特效
-// import {snow} from "@/common/js/snow";
 import {ElMessage} from "element-plus";
 import SideNavBar from "@/components/layout/SideNavBar";
 import ChatRoom from "@/components/ChatRoom";
@@ -57,16 +55,18 @@ export default {
   setup(){
     let blogInfo = ref()
     onBeforeMount(()=>{
-      getHomeInfo().then(res=>{
-        if (res.flag){
-          blogInfo.value = res.data
-          store.commit("setBlogInfo",res.data)
-        }else {
-          ElMessage({
-            type:'error',
-            message:'出错了'
-          })
-        }
+      setTimeout(()=>{
+        getHomeInfo().then(res=>{
+          if (res.flag){
+            blogInfo.value = res.data
+            store.commit("setBlogInfo",res.data)
+          }else {
+            ElMessage({
+              type:'error',
+              message:'出错了'
+            })
+          }
+        })
       })
     })
     return{

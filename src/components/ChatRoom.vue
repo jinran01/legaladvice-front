@@ -215,7 +215,7 @@ export default {
         console.log(event);
         // 发送心跳消息
         that.heartBeat = setInterval(function() {
-          var beatMessage = {
+          let beatMessage = {
             type: 6,
             data: "ping"
           };

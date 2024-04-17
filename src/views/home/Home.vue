@@ -46,74 +46,74 @@
       </div>
     </div>
     <!-- 主页文章 -->
+
     <v-row v-infinite-scroll="infiniteHandler" :infinite-scroll-disabled="disabled" class="home-container">
       <v-col md="9" cols="12">
-        <!-- 说说轮播 -->
-        <v-card class="animated zoomIn" v-if="talkList.length > 0">
-          <Swiper :list="talkList"/>
-        </v-card>
-        <v-card
-            class="animated zoomIn article-card"
-            style="border-radius: 12px 8px 8px 12px"
-            v-for="(item, index) of articleList"
-            :key="item.id"
-        >
-          <!-- 文章封面图 -->
-          <div :class="isRight(index)">
-            <router-link :to="'/articles/' + item.id">
-              <img
-                  class="on-hover"
-                  style="width: 100%;height: 100%;"
-                  :src="item.articleCover"
-              />
-            </router-link>
-          </div>
-          <!-- 文章信息 -->
-          <div class="article-wrapper">
-            <div style="line-height:1.4">
+          <!-- 说说轮播 -->
+          <v-card class="animated zoomIn" v-if="talkList.length > 0">
+            <Swiper :list="talkList"/>
+          </v-card>
+          <v-card
+              class="animated zoomIn article-card"
+              style="border-radius: 12px 8px 8px 12px"
+              v-for="(item, index) of articleList"
+              :key="item.id"
+          >
+            <!-- 文章封面图 -->
+            <div :class="isRight(index)">
               <router-link :to="'/articles/' + item.id">
-                {{ item.articleTitle }}
+                <img
+                    class="on-hover"
+                    style="width: 100%;height: 100%;"
+                    :src="item.articleCover"
+                />
               </router-link>
             </div>
-            <div class="article-info">
-              <!-- 是否置顶 -->
-              <span v-if="item.isTop == 1">
+            <!-- 文章信息 -->
+            <div class="article-wrapper">
+              <div style="line-height:1.4">
+                <router-link :to="'/articles/' + item.id">
+                  {{ item.articleTitle }}
+                </router-link>
+              </div>
+              <div class="article-info">
+                <!-- 是否置顶 -->
+                <span v-if="item.isTop == 1">
                 <span style="color:#ff7242">
                   <i class="iconfont iconzhiding"/> 置顶
                 </span>
                 <span class="separator">|</span>
               </span>
-              <!-- 发表时间 -->
-              <v-icon size="14">mdi-calendar-month-outline</v-icon>
-              {{ formatDate(item.createTime,"YYYY-MM-dd")}}
-              <span class="separator">|</span>
-              <!-- 文章分类 -->
-              <router-link :to="'/categories/' + item.categoryId">
-                <v-icon size="14">mdi-inbox-full</v-icon>
-                {{ item.categoryName }}
-              </router-link>
-              <span class="separator">|</span>
-              <!-- 文章标签 -->
-              <router-link
-                  style="display:inline-block"
-                  :to="'/tags/' + tag.id"
-                  class="mr-1"
-                  v-for="tag of item.tagDTOList"
-                  :key="tag.id"
-              >
-                <v-icon size="14">mdi-tag-multiple</v-icon>
-                {{ tag.tagName }}
-              </router-link>
+                <!-- 发表时间 -->
+                <v-icon size="14">mdi-calendar-month-outline</v-icon>
+                {{ formatDate(item.createTime, "YYYY-MM-dd") }}
+                <span class="separator">|</span>
+                <!-- 文章分类 -->
+                <router-link :to="'/categories/' + item.categoryId">
+                  <v-icon size="14">mdi-inbox-full</v-icon>
+                  {{ item.categoryName }}
+                </router-link>
+                <span class="separator">|</span>
+                <!-- 文章标签 -->
+                <router-link
+                    style="display:inline-block"
+                    :to="'/tags/' + tag.id"
+                    class="mr-1"
+                    v-for="tag of item.tagDTOList"
+                    :key="tag.id"
+                >
+                  <v-icon size="14">mdi-tag-multiple</v-icon>
+                  {{ tag.tagName }}
+                </router-link>
+              </div>
+              <!-- 文章内容 -->
+              <div class="article-content">
+                {{ item.articleContent }}
+              </div>
             </div>
-            <!-- 文章内容 -->
-            <div class="article-content">
-              {{ item.articleContent }}
-            </div>
-          </div>
-        </v-card>
-        <p class="loading"  v-if="loading">加载中...</p>
-      </v-col>
-      <!-- 博主信息 -->
+          </v-card>
+          <p class="loading" v-if="loading">加载中...</p>
+        </v-col>
       <v-col md="3" cols="12" class="d-md-block d-none">
         <div class="blog-wrapper">
           <v-card class="animated zoomIn blog-card mt-5">
@@ -218,6 +218,8 @@
         </div>
       </v-col>
     </v-row>
+
+
     <!-- 提示消息 -->
     <v-snackbar v-model="tip" color="#49b1f5" :timeout="1000">
       按CTRL+D 键将本页加入书签
@@ -233,12 +235,13 @@ import store from "@/store";
 
 import {getArticles, getArticlesList} from "@/network/article";
 import {formatDate} from "@/common/js/formatDate";
+
 export default {
   components: {
     Swiper,
   },
   setup() {
-    let infiniteLoadingRef =ref()
+    let infiniteLoadingRef = ref()
     let tip = ref(false)
     let time = ref('')
     let obj = reactive({
@@ -259,7 +262,7 @@ export default {
       current: 1
     })
 
-    let disabled = computed(()=>{
+    let disabled = computed(() => {
       return loading.value
     })
     // const getArticleList = () => {
@@ -278,26 +281,26 @@ export default {
     // }
     let flag = ref(true)
     const infiniteHandler = () => {
-      if (flag.value){
+      if (flag.value) {
         loading.value = true
-        getArticles({current:state.current,size:10}).then(res => {
+        getArticles({current: state.current, size: 10}).then(res => {
           let md = require("markdown-it")();
           if (res.flag && res.data.length !== 0) {
             res.data.forEach(item => {
               item.articleContent = md.render(item.articleContent)
-                .replace(/<\/?[^>]*>/g, "")
-                .replace(/[|]*\n/, "")
-                .replace(/&npsp;/gi, "");
+                  .replace(/<\/?[^>]*>/g, "")
+                  .replace(/[|]*\n/, "")
+                  .replace(/&npsp;/gi, "");
             })
             articleList.value.push(...(res.data))
             state.current = state.current + 1
-            setTimeout(()=>{
+            setTimeout(() => {
               loading.value = false
-            },2000)
-          }else {
-            setTimeout(()=>{
+            }, 2000)
+          } else {
+            setTimeout(() => {
               loading.value = false
-            },2000)
+            }, 2000)
             flag.value = false
           }
         })
@@ -353,7 +356,7 @@ export default {
     onMounted(() => {
       let pageList = store.state.blogInfo.pageList
       for (let i = 0; i < pageList.length; i++) {
-        if (pageList[i].pageName == "首页"){
+        if (pageList[i].pageName == "首页") {
           cover.value = "background: url(" + pageList[i].pageCover + ") center center / cover no-repeat";
         }
       }
@@ -509,11 +512,13 @@ export default {
   line-height: 40px;
   text-align: center;
   margin: 6px 0 -6px;
-  a{
+
+  a {
     font-size: 1.5rem;
     color: #4c4948;
   }
-  a:hover{
+
+  a:hover {
     color: #ff763b;
   }
 }
@@ -682,6 +687,7 @@ export default {
 .blog-info-data {
   flex: 1;
   text-align: center;
+
   a {
     color: #4c4948;
   }
@@ -780,11 +786,12 @@ export default {
     transform: scale(1.2);
   }
 }
-.loading{
+
+.loading {
   font-size: 14px;
   font-weight: bold;
   padding-top: 12px;
-  display:flex;
+  display: flex;
   justify-content: center;
   color: #49b1f5
 }

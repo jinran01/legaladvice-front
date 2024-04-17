@@ -256,7 +256,7 @@ export default {
   },
   setup() {
     let articleRef = ref()
-    let router = useRoute()
+    let route = useRoute()
     let imgUrlList = ref([])
     let article = reactive({
       nextArticle: {
@@ -306,7 +306,7 @@ export default {
         .replace(/&npsp;/gi, "");
     }
     const getArticle = () => {
-      getArticleById(router.params.id).then(res => {
+      getArticleById(route.params.id).then(res => {
         if (res.flag){
           document.title = res.data.articleTitle;
           article.articleContent = res.data.articleContent

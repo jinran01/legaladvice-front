@@ -1,7 +1,7 @@
 let state = {
   drawer:false,
   scrollTop:0,
-  blogInfo: "",
+  blogInfo: null,
   searchFlag: false,
   loginFlag: false,
   registerFlag: false,

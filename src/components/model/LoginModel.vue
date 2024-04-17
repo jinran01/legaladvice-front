@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="loginFlagVal"  :fullscreen="isMobile" max-width="460">
+  <v-dialog v-model="loginFlagVal" :fullscreen="isMobile" max-width="460" :style="{'top':isMobile?'0px':'60px'}">
     <v-card class="login-container" style="border-radius:4px">
       <v-icon style="position: relative;left: 90%" @click="closeLogin">
         mdi-close
@@ -8,12 +8,12 @@
         <div class="login-wrapper">
           <!-- 用户名 -->
           <v-text-field
-            v-model="username"
-            variant="underlined"
-            placeholder="请输入您的邮箱号"
-            :rules="[rules.checkEmail]"
-            clearable
-            @keyup.enter="login"
+              v-model="username"
+              variant="underlined"
+              placeholder="请输入您的邮箱号"
+              :rules="[rules.checkEmail]"
+              clearable
+              @keyup.enter="login"
           >
             <template v-slot:label>
               <span style="color: #1976d2">邮箱号</span>
@@ -22,16 +22,16 @@
           </v-text-field>
           <!-- 密码 -->
           <v-text-field
-            v-model="password"
-            class="mt-7"
-            variant="underlined"
-            label="密码"
-            :rules="[rules.passwordRequired]"
-            placeholder="请输入您的密码"
-            @keyup.enter="login"
-            :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="show ? 'text' : 'password'"
-            @click:append-inner="show = !show"
+              v-model="password"
+              class="mt-7"
+              variant="underlined"
+              label="密码"
+              :rules="[rules.passwordRequired]"
+              placeholder="请输入您的密码"
+              @keyup.enter="login"
+              :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="show ? 'text' : 'password'"
+              @click:append-inner="show = !show"
           >
             <template v-slot:label>
               <span style="color: #1976d2">密码</span>
@@ -39,11 +39,11 @@
           </v-text-field>
           <!-- 按钮 -->
           <v-btn
-            class="mt-7"
-            block
-            color="blue"
-            style="color:#fff"
-            @click="login"
+              class="mt-7"
+              block
+              color="blue"
+              style="color:#fff"
+              @click="login"
           >
             登录
           </v-btn>
@@ -92,42 +92,42 @@ export default {
       show: false
     })
     let form = ref()
-    const loginFlagVal = computed(()=>{
+    const loginFlagVal = computed(() => {
       return store.getters.getLoginFlag
     })
-    const closeLogin = ()=>{
-      store.commit("setLoginFlag",false)
+    const closeLogin = () => {
+      store.commit("setLoginFlag", false)
     }
     const isMobile = computed(() => {
       const clientWidth = document.documentElement.clientWidth;
       return clientWidth <= 960;
     })
-    const openRegister = ()=> {
-      store.commit("setLoginFlag",false)
-      store.commit("setRegisterFlag",true)
+    const openRegister = () => {
+      store.commit("setLoginFlag", false)
+      store.commit("setRegisterFlag", true)
     }
-    const openForget= ()=> {
+    const openForget = () => {
       state.loginFlag = false;
       state.forgetFlag = true;
     }
     let rules = {
       emailRequired: value => !!value || "邮箱不能为空！",
       passwordRequired: value => !!value || "密码不能为空！",
-      checkEmail: ()=> /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(stat.username) || "邮箱格式不正确！",
+      checkEmail: () => /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(stat.username) || "邮箱格式不正确！",
     }
-    const  login = async () => {
-      const {valid} =  await form.value.validate()
-      if (valid){
+    const login = async () => {
+      const {valid} = await form.value.validate()
+      if (valid) {
         let data = {
           username: stat.username,
           password: stat.password
         }
-        homeLogin(data).then(res=>{
-          if (res.flag){
-            store.commit("login",res.data.userInfo)
+        homeLogin(data).then(res => {
+          if (res.flag) {
+            store.commit("login", res.data.userInfo)
             ElMessage.success("登录成功！")
             closeLogin()
-          }else {
+          } else {
             ElMessage({
               type: 'error',
               message: res.message
@@ -136,7 +136,7 @@ export default {
         })
       }
     }
-    onMounted(()=>{
+    onMounted(() => {
 
     })
     return {
@@ -150,42 +150,6 @@ export default {
       openRegister,
       openForget
     }
-  },
-  methods: {
-    // login() {
-    //   var reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-    //   if (!reg.test(this.username)) {
-    //     this.$toast({type: "error", message: "邮箱格式不正确"});
-    //     return false;
-    //   }
-    //   if (this.password.trim().length == 0) {
-    //     this.$toast({type: "error", message: "密码不能为空"});
-    //     return false;
-    //   }
-    //   const that = this;
-    //   // eslint-disable-next-line no-undef
-    //   var captcha = new TencentCaptcha(this.config.TENCENT_CAPTCHA, function (res) {
-    //     if (res.ret === 0) {
-    //       //发送登录请求
-    //       let param = new URLSearchParams();
-    //       param.append("username", that.username);
-    //       param.append("password", that.password);
-    //       that.axios.post("/api/login", param).then(({data}) => {
-    //         if (data.flag) {
-    //           that.username = "";
-    //           that.password = "";
-    //           that.$store.commit("login", data.data);
-    //           that.$store.commit("closeModel");
-    //           that.$toast({type: "success", message: "登录成功"});
-    //         } else {
-    //           that.$toast({type: "error", message: data.message});
-    //         }
-    //       });
-    //     }
-    //   });
-    //   // 显示验证码
-    //   captcha.show();
-    // },
   }
 };
 </script>
@@ -197,6 +161,7 @@ export default {
   font-size: 0.75rem;
   text-align: center;
 }
+
 .social-login-title::before {
   content: "";
   display: inline-block;
@@ -206,6 +171,7 @@ export default {
   margin: 0 12px;
   vertical-align: middle;
 }
+
 .social-login-title::after {
   content: "";
   display: inline-block;
@@ -215,11 +181,13 @@ export default {
   margin: 0 12px;
   vertical-align: middle;
 }
+
 .social-login-wrapper {
   margin-top: 1rem;
   font-size: 2rem;
   text-align: center;
 }
+
 .social-login-wrapper a {
   text-decoration: none;
 }
