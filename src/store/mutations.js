@@ -7,7 +7,25 @@ const mutations = {
   },
   setRegisterFlag(state,data){
     state.registerFlag = data
-    console.log(state.registerFlag)
+  },
+  setForgetFlag(state,data){
+    state.forgetFlag = data
+  },
+  setArticleLike(state,articleId){
+    let articleLikeSet = state.articleLikeSet;
+    if (articleLikeSet.indexOf(articleId) != -1) {
+      articleLikeSet.splice(articleLikeSet.indexOf(articleId), 1);
+    } else {
+      articleLikeSet.push(articleId);
+    }
+  },
+  setCommentLike(state,commentId){
+    let commentLikeSet = state.commentLikeSet;
+    if (commentLikeSet.indexOf(commentId) != -1) {
+      commentLikeSet.splice(commentLikeSet.indexOf(commentId), 1);
+    } else {
+      commentLikeSet.push(commentId);
+    }
   },
   login(state, user) {
     state.userId = user.userInfoId;

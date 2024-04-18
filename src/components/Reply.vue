@@ -15,7 +15,7 @@
         <i class="iconfont iconbiaoqing" />
       </span>
       <div style="margin-left:auto">
-        <button @click="cancleReply" class="cancle-btn v-comment-btn">
+        <button @click="cancelReply" class="cancle-btn v-comment-btn">
           取消
         </button>
         <button @click="insertReply" class="upload-btn v-comment-btn">
@@ -31,6 +31,7 @@
 <script>
 import Emoji from "./Emoji";
 import EmojiList from "../assets/js/emoji";
+import {reactive, ref, toRefs} from "vue";
 export default {
   components: {
     Emoji
@@ -40,69 +41,82 @@ export default {
       type: Number
     }
   },
-  data: function() {
-    return {
+  setup(){
+    let stat = reactive({
       index: 0,
       chooseEmoji: false,
       nickname: "",
       replyUserId: null,
       parentId: null,
       commentContent: ""
-    };
-  },
-  methods: {
-    cancleReply() {
-      this.$refs.reply.style.display = "none";
-    },
-    insertReply() {
-      //判断登录
-      if (!this.$store.state.userId) {
-        this.$store.state.loginFlag = true;
-        return false;
-      }
-      if (this.commentContent.trim() == "") {
-        this.$toast({ type: "error", message: "回复不能为空" });
-        return false;
-      }
-      //解析表情
-      var reg = /\[.+?\]/g;
-      this.commentContent = this.commentContent.replace(reg, function(str) {
-        return (
-          "<img src= '" +
-          EmojiList[str] +
-          "' width='24'height='24' style='margin: 0 1px;vertical-align: text-bottom'/>"
-        );
-      });
-      const path = this.$route.path;
-      const arr = path.split("/");
-      var comment = {
-        type: this.type,
-        replyUserId: this.replyUserId,
-        parentId: this.parentId,
-        commentContent: this.commentContent
-      };
-      switch (this.type) {
-        case 1:
-        case 3:
-          comment.topicId = arr[2];
-          break;
-        default:
-          break;
-      }
-      this.commentContent = "";
-      this.axios.post("/api/comments", comment).then(({ data }) => {
-        if (data.flag) {
-          this.$emit("reloadReply", this.index);
-          this.$toast({ type: "success", message: "回复成功" });
-        } else {
-          this.$toast({ type: "error", message: data.message });
-        }
-      });
-    },
-    addEmoji(text) {
-      this.commentContent += text;
+    })
+    let reply = ref()
+    //取消回复
+    const cancelReply = () => {
+      reply.value.style.display = "none"
     }
-  }
+    //回复评论
+    const insertReply = () => {
+      console.log("回复评论")
+    }
+    const addEmoji = (emoji) => {
+      stat.commentContent += emoji
+    }
+    return{
+      ...toRefs(stat),
+      reply,
+      cancelReply,
+      addEmoji,
+      insertReply,
+    }
+  },
+  // methods: {
+  //   insertReply() {
+  //     //判断登录
+  //     if (!this.$store.state.userId) {
+  //       this.$store.state.loginFlag = true;
+  //       return false;
+  //     }
+  //     if (this.commentContent.trim() == "") {
+  //       this.$toast({ type: "error", message: "回复不能为空" });
+  //       return false;
+  //     }
+  //     //解析表情
+  //     var reg = /\[.+?\]/g;
+  //     this.commentContent = this.commentContent.replace(reg, function(str) {
+  //       return (
+  //         "<img src= '" +
+  //         EmojiList[str] +
+  //         "' width='24'height='24' style='margin: 0 1px;vertical-align: text-bottom'/>"
+  //       );
+  //     });
+  //     const path = this.$route.path;
+  //     const arr = path.split("/");
+  //     var comment = {
+  //       type: this.type,
+  //       replyUserId: this.replyUserId,
+  //       parentId: this.parentId,
+  //       commentContent: this.commentContent
+  //     };
+  //     switch (this.type) {
+  //       case 1:
+  //       case 3:
+  //         comment.topicId = arr[2];
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //     this.commentContent = "";
+  //     this.axios.post("/api/comments", comment).then(({ data }) => {
+  //       if (data.flag) {
+  //         this.$emit("reloadReply", this.index);
+  //         this.$toast({ type: "success", message: "回复成功" });
+  //       } else {
+  //         this.$toast({ type: "error", message: data.message });
+  //       }
+  //     });
+  //   },
+  // }
 };
 </script>
 

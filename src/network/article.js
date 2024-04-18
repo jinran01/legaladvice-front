@@ -6,14 +6,26 @@ export function getArticles(data) {
     params: data
   })
 }
+//查询文章列表
 export function getArticlesList(data) {
   return request({
     url:'/articles/condition',
     params: data
   })
 }
+
+//通过id查询文章
 export function getArticleById(id) {
   return request({
     url:`/articles/${id}`
   })
 }
+
+//文章点赞
+export function articleLike(articleId) {
+  return request({
+    url:`/articles/${articleId}/like`,
+    method: "POST"
+  })
+}
+

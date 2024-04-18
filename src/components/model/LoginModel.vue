@@ -107,8 +107,8 @@ export default {
       store.commit("setRegisterFlag", true)
     }
     const openForget = () => {
-      state.loginFlag = false;
-      state.forgetFlag = true;
+      store.commit("setLoginFlag", false)
+      store.commit("setForgetFlag", true)
     }
     let rules = {
       emailRequired: value => !!value || "邮箱不能为空！",
@@ -126,6 +126,8 @@ export default {
           if (res.flag) {
             store.commit("login", res.data.userInfo)
             ElMessage.success("登录成功！")
+            stat.username = ""
+            stat.password = ""
             closeLogin()
           } else {
             ElMessage({

@@ -103,6 +103,8 @@
 </template>
 
 <script>
+import {computed, ref} from "vue";
+
 export default {
   props: {
     totalPage: {
@@ -115,49 +117,50 @@ export default {
       type: Number
     }
   },
-  data: function() {
-    return {
-      current: 1
-    };
-  },
-  methods: {
-    changeReplyCurrent(i) {
-      this.current = i;
-      this.$emit(
-        "changeReplyCurrent",
-        this.current,
-        this.index,
-        this.commentId
-      );
-    },
-    prePage() {
-      this.current -= 1;
-      this.$emit(
-        "changeReplyCurrent",
-        this.current,
-        this.index,
-        this.commentId
-      );
-    },
-    nextPage() {
-      this.current += 1;
-      this.$emit(
-        "changeReplyCurrent",
-        this.current,
-        this.index,
-        this.commentId
+  setup(props,context){
+    let current = ref(1)
+    const changeReplyCurrent = (i) => {
+      current.value = i
+      context.emit(
+          "changeReplyCurrent",
+          current.value,
+          props.index,
+          props.commentId
       );
     }
-  },
-  computed: {
-    isActive() {
+    const prePage = () => {
+      current.value -= 1
+      context.emit(
+          "changeReplyCurrent",
+          current.value,
+          props.index,
+          props.commentId
+      );
+    }
+    const nextPage = () => {
+      current.value += 1
+      context.emit(
+          "changeReplyCurrent",
+          current.value,
+          props.index,
+          props.commentId
+      );
+    }
+    const isActive = computed(()=>{
       return function(i) {
         if (i == this.current) {
           return "active";
         }
-      };
+      }
+    })
+    return{
+      current,
+      changeReplyCurrent,
+      prePage,
+      nextPage,
+      isActive,
     }
-  }
+  },
 };
 </script>
 

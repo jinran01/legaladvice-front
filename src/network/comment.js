@@ -13,3 +13,19 @@ export function commentLike(commentId) {
         method: "POST"
     })
 }
+
+//新增评论
+export function saveComment(comment) {
+    return request({
+        url:`/comments`,
+        method: "POST",
+        data: comment
+    })
+}
+//查看下一页回复
+export function repliesList(commentId,data) {
+    return request({
+        url:`/comments/${commentId}/replies`,
+        params: data
+    })
+}

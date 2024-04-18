@@ -37,7 +37,7 @@
             <!-- 字数统计 -->
             <span>
               <i class="iconfont iconzishu"/>
-              字数统计: {{ wordNum | num }}
+              字数统计: {{ wordNum }}
             </span>
             <span class="separator">|</span>
             <!-- 阅读时长 -->
@@ -84,7 +84,7 @@
               <a :href="articleHref" target="_blank">{{ articleHref }} </a>
             </div>
             <div>
-              <span>版权声明：</span>本博客所有文章除特别声明外，均采用
+              <span>版权声明：</span>本网站所有文章除特别声明外，均采用
               <a
                   href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
                   target="_blank"
@@ -238,15 +238,15 @@ import Clipboard from "clipboard";
 import markdownToHtml from "../../utils/markdown";
 import Comment from "../../components/Comment";
 import tocbot from "tocbot";
-import {getArticleById} from "@/network/article";
+import {articleLike, getArticleById} from "@/network/article";
 import {computed, nextTick, onMounted, reactive, ref, toRefs} from "vue";
 import store from "@/store";
 import {useRoute} from "vue-router";
 import {ElMessage} from "element-plus";
-import {ImagePreview} from "vant";
 import state from "@/store/state";
 import {Share} from "vue3-social-share";
 import {formatDate} from "@/common/js/formatDate";
+import {ImagePreview} from "vant";
 
 export default {
   methods: {formatDate},
@@ -282,7 +282,7 @@ export default {
       return store.state.blogInfo
     })
     let isLike = computed(()=>{
-      let articleLikeSet = state.articleLikeSet;
+      let articleLikeSet = store.state.articleLikeSet;
       return articleLikeSet.indexOf(article.id) != -1
         ? "like-btn-active"
         : "like-btn";
@@ -309,11 +309,12 @@ export default {
       getArticleById(route.params.id).then(res => {
         if (res.flag){
           document.title = res.data.articleTitle;
+          article.id = res.data.id
           article.articleContent = res.data.articleContent
           article.articleCover = res.data.articleCover
           article.articleTitle = res.data.articleTitle
           article.tagDTOList = res.data.tagDTOList
-          article.viewsCount = res.data.viewsCount
+          article.viewsCount = res.data.viewsCount ? res.data.viewsCount : 0
           article.createTime = res.data.createTime
           article.updateTime = res.data.updateTime
           article.categoryName = res.data.categoryName
@@ -321,12 +322,14 @@ export default {
           article.recommendArticleList = res.data.recommendArticleList
           article.lastArticle = res.data.lastArticle
           article.nextArticle = res.data.nextArticle
+          article.likeCount = res.data.likeCount
           article.articleContent = markdownToHtml(
             res.data.articleContent
           );
           nextTick(()=>{
             stat.wordNum = deleteHTMLTag(article.articleContent).length
             stat.readTime = Math.round(stat.wordNum / 400) + "分钟";
+            stat.wordNum = (stat.wordNum / 1000).toFixed(1) + "k"
             const clipboard  = new Clipboard(".copy-btn")
             clipboard.on('success',()=>{
               ElMessage.success({message:"复制成功！"})
@@ -359,8 +362,11 @@ export default {
             }
             const previewImg = (img)=> {
               ImagePreview({
-                images: [img],
-                closeable: true
+                showIndex: true,
+                images: imgUrlList.value,
+                closeable:true,
+                doubleScale:false,
+                showIndicators: true
               })
             }
           })
@@ -373,11 +379,35 @@ export default {
 
       })
     }
+    const like = () => {
+      //判断是否登录
+      if (!store.state.userId){
+        store.commit("setLoginFlag",true)
+      }else {
+        articleLike(article.id).then(res=>{
+          if (res.flag){
+            if (store.state.articleLikeSet.indexOf(article.id) != -1){
+              //取消点赞
+              article.likeCount -= 1
+            }else {
+              //点赞
+              article.likeCount += 1
+            }
+            store.commit("setArticleLike", article.id);
+          }
+        })
+      }
+    }
+    const getCommentCount = (count) => {
+      stat.commentCount = count ? count : 0
+    }
     onMounted(() => {
       getArticle()
     })
     return{
       ...toRefs(stat),
+      like,
+      getCommentCount,
       isFull,
       articleCover,
       articleRef,
@@ -391,64 +421,7 @@ export default {
   //   this.clipboard.destroy();
   //   tocbot.destroy();
   // },
-  // methods: {
-  //   getArticle() {
-  //     const that = this;
-  //     //查询文章
-  //     this.axios.get("/api/" + this.$route.path).then(({ data }) => {
-  //       document.title = data.data.articleTitle;
-  //       //将markdown转换为Html
-  //       this.article = data.data;
-  //       this.article.articleContent = markdownToHtml(
-  //         this.article.articleContent
-  //       );
-  //       this.$nextTick(() => {
-  //         // 统计文章字数
-  //         this.wordNum = this.deleteHTMLTag(this.article.articleContent).length;
-  //         // 计算阅读时间
-  //         this.readTime = Math.round(this.wordNum / 400) + "分钟";
-  //         // 添加代码复制功能
-  //         this.clipboard = new Clipboard(".copy-btn");
-  //         this.clipboard.on("success", () => {
-  //           this.$toast({ type: "success", message: "复制成功" });
-  //         });
-  //         // 添加文章生成目录功能
-  //         let nodes = this.$refs.article.children;
-  //         if (nodes.length) {
-  //           for (let i = 0; i < nodes.length; i++) {
-  //             let node = nodes[i];
-  //             let reg = /^H[1-4]{1}$/;
-  //             if (reg.exec(node.tagName)) {
-  //               node.id = i;
-  //             }
-  //           }
-  //         }
-  //         tocbot.init({
-  //           tocSelector: "#toc", //要把目录添加元素位置，支持选择器
-  //           contentSelector: ".article-content", //获取html的元素
-  //           headingSelector: "h1, h2, h3", //要显示的id的目录
-  //           hasInnerContainers: true,
-  //           onClick: function(e) {
-  //             e.preventDefault();
-  //           }
-  //         });
-  //         // 添加图片预览功能
-  //         const imgList = this.$refs.article.getElementsByTagName("img");
-  //         for (var i = 0; i < imgList.length; i++) {
-  //           this.imgList.push(imgList[i].src);
-  //           imgList[i].addEventListener("click", function(e) {
-  //             that.previewImg(e.target.currentSrc);
-  //           });
-  //         }
-  //       });
-  //     });
-  //   },
   //   like() {
-  //     // 判断登录
-  //     if (!this.$store.state.userId) {
-  //       this.$store.state.loginFlag = true;
-  //       return false;
-  //     }
   //     //发送请求
   //     this.axios
   //       .post("/api/articles/" + this.article.id + "/like")
@@ -466,44 +439,6 @@ export default {
   //         }
   //       });
   //   },
-  //   previewImg(img) {
-  //     this.$imagePreview({
-  //       images: this.imgList,
-  //       index: this.imgList.indexOf(img)
-  //     });
-  //   },
-  //   deleteHTMLTag(content) {
-  //     return content
-  //       .replace(/<\/?[^>]*>/g, "")
-  //       .replace(/[|]*\n/, "")
-  //       .replace(/&npsp;/gi, "");
-  //   },
-  //   getCommentCount(count) {
-  //     this.commentCount = count;
-  //   }
-  // },
-  // computed: {
-  //   blogInfo() {
-  //     return this.$store.state.blogInfo;
-  //   },
-  //   articleCover() {
-  //     return (
-  //       "background: url(" +
-  //       this.article.articleCover +
-  //       ") center center / cover no-repeat"
-  //     );
-  //   },
-  //   isLike() {
-  //     var articleLikeSet = this.$store.state.articleLikeSet;
-  //     return articleLikeSet.indexOf(this.article.id) != -1
-  //       ? "like-btn-active"
-  //       : "like-btn";
-  //   },
-  //   isFull() {
-  //     return function(id) {
-  //       return id ? "post full" : "post";
-  //     };
-  //   }
   // }
 };
 </script>

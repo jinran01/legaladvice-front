@@ -14,7 +14,7 @@
     <!-- 注册模态框 -->
     <RegisterModel></RegisterModel>
     <!-- 忘记密码模态框 -->
-<!--    <ForgetModel></ForgetModel>-->
+    <ForgetModel></ForgetModel>
     <!-- 音乐播放器 -->
 
     <!-- 聊天室 -->

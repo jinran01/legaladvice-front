@@ -215,13 +215,13 @@ export default {
     }
     const getScrollTop = computed(() => {
       window.addEventListener("scroll", () => {
-        state.scrollTop = document.documentElement.scrollTop;
+        store.state.scrollTop = document.documentElement.scrollTop;
       });
-      return state.scrollTop
+      return store.state.scrollTop
     })
     watch(getScrollTop, (newValue, oldValue) => {
       flag.value = false
-      if (state.scrollTop > 60) {
+      if (store.state.scrollTop > 60) {
         navClass.value = 'nav-fixed'
         if (newValue > oldValue) {
           flag.value = true

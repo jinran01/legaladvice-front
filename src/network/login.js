@@ -21,3 +21,11 @@ export function registerUser(data){
         data
     })
 }
+
+export function forgetPassword(data){
+    return request({
+        url:'/system/user/forget/pass',
+        method: "POST",
+        data
+    })
+}
