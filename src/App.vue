@@ -15,8 +15,8 @@
     <RegisterModel></RegisterModel>
     <!-- 忘记密码模态框 -->
     <ForgetModel></ForgetModel>
-    <!-- 音乐播放器 -->
-
+    <!-- 修改密码模态框 -->
+    <EmailModel></EmailModel>
     <!-- 聊天室 -->
     <ChatRoom></ChatRoom>
 
@@ -28,7 +28,7 @@
 import Footer from "@/components/layout/Footer";
 import TopNavBar from "@/components/layout/TopNavBar";
 import BackTop from "@/components/BackTop";
-import {onBeforeMount, ref} from "vue";
+import {onBeforeMount, onMounted, ref} from "vue";
 import store from "@/store";
 import {getHomeInfo} from "@/network/home";
 import {ElMessage} from "element-plus";
@@ -37,12 +37,14 @@ import ChatRoom from "@/components/ChatRoom";
 import LoginModel from "@/components/model/LoginModel.vue";
 import RegisterModel from "@/components/model/RegisterModel.vue";
 import ForgetModel from "@/components/model/ForgetModel.vue";
+import EmailModel from "@/components/model/EmailModel";
 
 
 export default {
 
   name: 'App',
   components: {
+    EmailModel,
     ForgetModel,
     RegisterModel,
     LoginModel,

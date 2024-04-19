@@ -7,6 +7,9 @@ const getters = {
     },
     getForgetFlag(state){
         return state.forgetFlag
+    },
+    getEmailFlag(state){
+        return state.emailFlag
     }
 }
 export default getters;

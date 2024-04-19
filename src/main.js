@@ -19,6 +19,8 @@ import vuetify from './plugins/vuetify'
 import {createPinia} from "pinia";
 import store from "./store"
 import {loadFonts} from './plugins/webfontloader'
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
 loadFonts()
 const app = createApp(App)
 const pinia = createPinia()

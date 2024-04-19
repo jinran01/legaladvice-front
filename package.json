@@ -35,6 +35,7 @@
     "tocbot": "^4.18.2",
     "vant": "^3.6.12",
     "vue": "^3.2.13",
+    "vue-avatar-cropper": "^6.0.1",
     "vue-danmaku": "^1.7.0",
     "vue-image-swipe": "^1.0.5",
     "vue-infinite-loading": "^3.0.0-alpha.0-0",
@@ -44,6 +45,7 @@
     "vue3-social-share": "^0.1.8",
     "vuetify": "^3.0.0-beta.0",
     "vuex": "^4.0.0",
+    "uuid": "^9.0.1",
     "vuex-persistedstate": "^4.1.0",
     "webfontloader": "^1.0.0"
   },

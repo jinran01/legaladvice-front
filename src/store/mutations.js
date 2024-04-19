@@ -11,6 +11,9 @@ const mutations = {
   setForgetFlag(state,data){
     state.forgetFlag = data
   },
+  setEmailFlag(state,data){
+    state.emailFlag = data
+  },
   setArticleLike(state,articleId){
     let articleLikeSet = state.articleLikeSet;
     if (articleLikeSet.indexOf(articleId) != -1) {
@@ -26,6 +29,10 @@ const mutations = {
     } else {
       commentLikeSet.push(commentId);
     }
+  },
+  updateUserInfo(state,data){
+    state.nickname = data.nickname
+    state.intro = data.intro
   },
   login(state, user) {
     state.userId = user.userInfoId;

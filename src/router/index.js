@@ -1,14 +1,21 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import NProgress from "nprogress";
 
 const Home = () => import("@/views/home/Home")
 const Message = () => import("@/views/message/Message")
 const Article = () => import("@/views/article/Article")
 const ArticleList = () => import("@/views/article/ArticleList")
+const Category = () => import("@/views/category/Category")
+const User = () => import("@/views/user/User")
+// const x = () => import()
 
 const routes = [
   {
     path: '/',
     name: 'Home',
+    meta: {
+      title: "法律咨询与援助公益平台"
+    },
     component: Home
   },
   {
@@ -56,14 +63,14 @@ const routes = [
   },
   {
     path: "/categories",
-    component: resolve => require(["../views/category/Category.vue"], resolve),
+    component: Category,
     meta: {
       title: "分类"
     }
   },
   {
     path: "/categories/:categoryId",
-    component: resolve => require(["../views/article/ArticleList.vue"], resolve)
+    component: ArticleList
   },
   {
     path: "/tags/:tagId",
@@ -91,8 +98,8 @@ const routes = [
     }
   },
   {
-    path: "/user",
-    // component: resolve => require(["../views/user/User.vue"], resolve),
+    path: "/setting",
+    component: User,
     meta: {
       title: "个人中心"
     }
@@ -111,5 +118,20 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
-
+router.beforeEach((to, from, next) => {
+  NProgress.start();
+  if (to.meta.title) {
+    document.title = to.meta.title;
+  }
+  setTimeout(()=>{
+    next()
+  },500)
+});
+router.afterEach(() => {
+  window.scrollTo({
+    top: 0,
+    behavior: "instant"
+  });
+  NProgress.done();
+});
 export default router

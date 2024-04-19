@@ -130,18 +130,19 @@
               <p class="comment-content">
                 <!-- 回复用户名 -->
                 <template v-if="reply.replyUserId != item.userId">
-                  <span v-if="!reply.replyWebSite" class="ml-1">
+                  <span v-if="!reply.replyWebSite" class="ml-1 comment-nickname" >
                     @{{ reply.replyNickname }}
                   </span>
                   <a
                       v-else
                       :href="reply.replyWebSite"
                       target="_blank"
+                      style="background-color: #00a1d6"
                       class="comment-nickname ml-1"
                   >
                     @{{ reply.replyNickname }}
                   </a>
-                  ,
+                   :
                 </template>
                 <span v-html="reply.commentContent"/>
               </p>
@@ -255,6 +256,7 @@ export default {
         default:
           break;
       }
+
       getCommentByTopicId(param).then(res => {
         if (stat.current == 1) {
           stat.commentList = res.data.recordList;
@@ -348,9 +350,9 @@ export default {
       }
     }
     let replyRef = ref()
-
     //恢复评论
     const replyComment = (index, item) => {
+      replyRef.value[index].showReply = false;
       replyRef.value.forEach(item => {
         item.$el.style.display = "none";
       });
@@ -360,8 +362,8 @@ export default {
       replyRef.value[index].replyUserId = item.userId;
       replyRef.value[index].parentId = stat.commentList[index].id;
       replyRef.value[index].chooseEmoji = false;
+      replyRef.value[index].showReply = true;
       replyRef.value[index].index = index;
-      replyRef.value[index].$el.style.display = "block";
     }
     let paging = ref()
     let check = ref()
@@ -411,65 +413,6 @@ export default {
       changeReplyCurrent,
     }
   }
-  // methods: {
-  //   replyComment(index, item) {
-  //     this.$refs.reply.forEach(item => {
-  //       item.$el.style.display = "none";
-  //     });
-  //     //传值给回复框
-  //     this.$refs.reply[index].commentContent = "";
-  //     this.$refs.reply[index].nickname = item.nickname;
-  //     this.$refs.reply[index].replyUserId = item.userId;
-  //     this.$refs.reply[index].parentId = this.commentList[index].id;
-  //     this.$refs.reply[index].chooseEmoji = false;
-  //     this.$refs.reply[index].index = index;
-  //     this.$refs.reply[index].$el.style.display = "block";
-  //   },
-  //   checkReplies(index, item) {
-  //     this.axios
-  //       .get("/api/comments/" + item.id + "/replies", {
-  //         params: { current: 1, size: 5 }
-  //       })
-  //       .then(({ data }) => {
-  //         this.$refs.check[index].style.display = "none";
-  //         item.replyDTOList = data.data;
-  //         //超过1页才显示分页
-  //         if (Math.ceil(item.replyCount / 5) > 1) {
-  //           this.$refs.paging[index].style.display = "flex";
-  //         }
-  //       });
-  //   },
-  //   changeReplyCurrent(current, index, commentId) {
-  //     //查看下一页回复
-  //     this.axios
-  //       .get("/api/comments/" + commentId + "/replies", {
-  //         params: { current: current, size: 5 }
-  //       })
-  //       .then(({ data }) => {
-  //         this.commentList[index].replyDTOList = data.data;
-  //       });
-  //   },
-
-  //   reloadReply(index) {
-  //     this.axios
-  //       .get("/api/comments/" + this.commentList[index].id + "/replies", {
-  //         params: {
-  //           current: this.$refs.page[index].current,
-  //           size: 5
-  //         }
-  //       })
-  //       .then(({ data }) => {
-  //         this.commentList[index].replyCount++;
-  //         //回复大于5条展示分页
-  //         if (this.commentList[index].replyCount > 5) {
-  //           this.$refs.paging[index].style.display = "flex";
-  //         }
-  //         this.$refs.check[index].style.display = "none";
-  //         this.$refs.reply[index].$el.style.display = "none";
-  //         this.commentList[index].replyDTOList = data.data;
-  //       });
-  //   }
-  // },
   // watch: {
   //   commentList() {
   //     this.reFresh = false;
@@ -545,7 +488,11 @@ export default {
 .comment-nickname {
   text-decoration: none;
   color: #1abc9c !important;
-  font-weight: 500;
+  /*border: 1px solid rgba(0,0,0,0.01);*/
+  border-radius: 5px;
+  background-color: rgba(0,0,0,0.03);
+  cursor: pointer;
+  font-weight: bold;
 }
 
 .comment-info {

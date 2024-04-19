@@ -29,3 +29,11 @@ export function forgetPassword(data){
         data
     })
 }
+
+export function userInfoUpdate(data){
+    return request({
+        url:'/users/info',
+        method: "PUT",
+        data
+    })
+}

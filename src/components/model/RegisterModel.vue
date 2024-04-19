@@ -79,7 +79,7 @@
 <script>
 import {computed, reactive, ref, toRefs} from "vue";
 import store from "@/store";
-import {getRegisterEmail} from "@/network/system";
+import {getEmailCode, getRegisterEmail} from "@/network/system";
 import {ElMessage} from "element-plus";
 import {registerUser} from "@/network/login";
 
@@ -112,7 +112,7 @@ export default {
 
     //发送验证码
     const sendCode = () => {
-      getRegisterEmail({username:stat.username}).then(res => {
+      getEmailCode({username:stat.username}).then(res => {
         if (res.flag) {
           ElMessage.success("发送成功")
           countDown()

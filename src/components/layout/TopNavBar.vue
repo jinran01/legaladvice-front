@@ -186,14 +186,9 @@ export default {
     //   scrollTop: 0
     // })
     const openLogin = () => {
-      store.commit("setLoginFlag", !state.loginFlag)
+      store.commit("setLoginFlag", true)
     }
-    let test = computed(() => {
-      return state.loginFlag
-    })
-    watch(test, (a, b) => {
-      console.log(a, b)
-    })
+
     //退出
     const logout = () => {
       homeLogout().then(res=>{

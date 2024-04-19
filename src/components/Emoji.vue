@@ -34,7 +34,6 @@ export default {
     //   current: 1,
     //   size: 20,
     // })
-    // let chooseEmoji = ref(props.chooseEmoji)
     let emojiList = ref({})
     const addEmoji = (key) => {
       context.emit("addEmoji", key)
