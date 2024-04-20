@@ -14,6 +14,9 @@ const mutations = {
   setEmailFlag(state,data){
     state.emailFlag = data
   },
+  setPhoneFlag(state,data){
+    state.phoneFlag = data
+  },
   setArticleLike(state,articleId){
     let articleLikeSet = state.articleLikeSet;
     if (articleLikeSet.indexOf(articleId) != -1) {

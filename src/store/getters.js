@@ -1,3 +1,5 @@
+import state from "@/store/state";
+
 const getters = {
     getLoginFlag(state){
         return state.loginFlag
@@ -10,6 +12,9 @@ const getters = {
     },
     getEmailFlag(state){
         return state.emailFlag
+    },
+    getPhoneFlag(state){
+        return state.phoneFlag
     }
 }
 export default getters;

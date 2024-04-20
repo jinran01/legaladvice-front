@@ -17,6 +17,8 @@
     <ForgetModel></ForgetModel>
     <!-- 修改密码模态框 -->
     <EmailModel></EmailModel>
+    <!-- 绑定手机号模态框 -->
+    <PhoneModel></PhoneModel>
     <!-- 聊天室 -->
     <ChatRoom></ChatRoom>
 
@@ -38,12 +40,14 @@ import LoginModel from "@/components/model/LoginModel.vue";
 import RegisterModel from "@/components/model/RegisterModel.vue";
 import ForgetModel from "@/components/model/ForgetModel.vue";
 import EmailModel from "@/components/model/EmailModel";
+import PhoneModel from "@/components/model/PhoneModel";
 
 
 export default {
 
   name: 'App',
   components: {
+    PhoneModel,
     EmailModel,
     ForgetModel,
     RegisterModel,

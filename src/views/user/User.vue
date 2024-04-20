@@ -9,19 +9,16 @@
       </div>
       <v-row class="info-wrapper">
         <v-col md="3" cols="12">
-          <button id="pick-avatar">
-            <v-avatar size="140">
-              <img style="width: 100%;height: 100%" :src="userInfo.avatar" @click="changeAvatar"/>
-            </v-avatar>
-          </button>
-          <avatar-cropper
-              v-model="show"
-              :labels="{ submit: '确定', cancel: '取消' }"
-              :upload-form-data="uploadData"
-              @change="selectAvatar"
-              @uploading="uploadAvatar"
-              upload-url="https://legaladvice.oss-cn-beijing.aliyuncs.com/"
-          />
+          <el-upload
+              action="https://legaladvice.oss-cn-beijing.aliyuncs.com/"
+              :show-file-list="false"
+              :auto-upload="true"
+              :data="data"
+              :before-upload="before_upload"
+              :on-success="avatar_success"
+          >
+            <el-image :src="userInfo.avatar" style="border-radius: 150px;width: 150px;height: 150px"/>
+          </el-upload>
         </v-col>
         <v-col md="7" cols="12">
           <v-text-field
@@ -30,13 +27,7 @@
               label="昵称"
               placeholder="请输入您的昵称"
           />
-          <!--          <v-text-field-->
-          <!--              variant="underlined"-->
-          <!--              v-model="userInfo.webSite"-->
-          <!--              class="mt-7"-->
-          <!--              label="个人网站"-->
-          <!--              placeholder="http://你的网址"-->
-          <!--          />-->
+
           <v-text-field
               variant="underlined"
               v-model="userInfo.intro"
@@ -44,6 +35,23 @@
               label="简介"
               placeholder="介绍下自己吧"
           />
+          <div class="mt-7 binding">
+            <v-text-field
+                disabled
+                variant="underlined"
+                v-model="userInfo.phone"
+                class="mt-7"
+                label="手机号"
+                placeholder="请绑定手机号"
+            />
+            <v-btn v-if="userInfo.phone" style="top: 10px" text small @click="openPhoneModel">
+              修改绑定
+            </v-btn>
+            <v-btn v-else  style="top: 10px" text small @click="openPhoneModel">
+              绑定手机号
+            </v-btn>
+          </div>
+
           <div v-if="loginType != 0" class="mt-7 binding">
             <v-text-field
                 disabled
@@ -81,18 +89,29 @@ export default {
   components: {AvatarCropper},
   setup() {
     let userInfo = reactive({
+      phone: store.state.phone,
       nickname: store.state.nickname,
       intro: store.state.intro,
       loginType: store.state.loginType,
       avatar: store.state.avatar
     })
     let show = ref(false)
+    //请求oss 数据
+    let data = ref({
+      key: '',
+      policy: '',
+      OSSAccessKeyId: '',
+      signature: '',
+    })
     const changeAvatar = () => {
       show.value = true
     }
     const email = computed(() => {
       return store.state.email
     })
+    const openPhoneModel = () => {
+      store.commit("setPhoneFlag", true)
+    }
     const openEmailModel = () => {
       store.commit("setEmailFlag", true)
     }
@@ -102,38 +121,36 @@ export default {
         nickname: userInfo.nickname,
         intro: userInfo.intro
       }
-      userInfoUpdate(data).then(res=>{
-        if (res.flag){
+      userInfoUpdate(data).then(res => {
+        if (res.flag) {
           ElMessage.success("修改成功！")
-        }else {
+        } else {
           ElMessage.error(res.message)
         }
       })
-      store.commit("updateUserInfo",data)
+      store.commit("updateUserInfo", data)
     }
-    let uploadData = new FormData()
-    const selectAvatar = (data) => {
-      getPolicy({path:"avatar"}).then(res => {
-        uploadData.set("signature",res.data.signature)
-        uploadData.set("policy",res.data.policy)
-        uploadData.set("OSSAccessKeyId",res.data.accessKeyId)
-        uploadData.set("key",res.data.dir + v4() + "." + 'jpg')
-      })
-      console.log(uploadData)
-    }
-    const uploadAvatar = async ({form, request, response}) => {
-      // let type = form.get("file").name.split(".")
-      // type = type[type.length - 1] in ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]?
-      //     type[type.length - 1] : "jpg"
-      // getPolicy({path:"avatar"}).then(res => {
-      //   uploadData.set("signature",res.data.signature)
-      //   uploadData.set("policy",res.data.policy)
-      //   uploadData.set("OSSAccessKeyId",res.data.accessKeyId)
-      //   uploadData.set("key",res.data.dir + v4() + "." + type)
+    //上传前
+    const before_upload = (file) => {
+      // let types = ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]
+      let type = file.name.split(".")
+      type = type[type.length - 1]
+      // return  new Promise((resolve, reject)=>{
+      //   getPolicy({path: "avatar"}).then(res => {
+      //     data.value.OSSAccessKeyId = res.data.accessKeyId
+      //     data.value.signature = res.data.signature
+      //     data.value.policy = res.data.policy
+      //     data.value.key = res.data.dir + v4() + "." + type
+      //     setTimeout(()=>{
+      //       resolve(file)
+      //     },5000)
+      //   })
       // })
-      console.log(form)
     }
-    const loginType = computed(()=>{
+    const avatar_success = () => {
+      store.state.avatar = "https://legaladvice.oss-cn-beijing.aliyuncs.com/" + data.value.key
+    }
+    const loginType = computed(() => {
       return store.state.loginType
     })
     const cover = computed(() => {
@@ -151,12 +168,13 @@ export default {
       cover,
       show,
       loginType,
-      uploadData,
-      selectAvatar,
+      data,
+      before_upload,
       changeAvatar,
-      uploadAvatar,
+      avatar_success,
       openEmailModel,
       updateUserInfo,
+      openPhoneModel,
     }
   },
 
