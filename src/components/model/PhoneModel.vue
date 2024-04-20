@@ -84,7 +84,7 @@ export default {
     //发送验证码
     const sendCode = () => {
       if (stat.phone.trim() != ""){
-        getPhoneCode().then(res => {
+        getPhoneCode({phone:stat.phone}).then(res => {
           if (res.flag) {
             ElMessage.success("发送成功")
             countDown()
@@ -106,11 +106,9 @@ export default {
         }
         changeUserPhone(data).then(res => {
           if (res.flag) {
-            ElMessage.success("修改成功,请重新登录！")
+            ElMessage.success("修改成功！")
             stat.username = null
             stat.code = ""
-            // store.commit("logout")
-            // router.push("/")
             homeLogout()
             closePhone()
           } else {

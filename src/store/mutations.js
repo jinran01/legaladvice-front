@@ -41,6 +41,7 @@ const mutations = {
     state.userId = user.userInfoId;
     state.avatar = user.avatar;
     state.nickname = user.nickname;
+    state.phone = user.phone;
     state.intro = user.intro;
     state.webSite = user.webSite;
     state.articleLikeSet = user.articleLikeSet ? user.articleLikeSet : [];

@@ -7,9 +7,10 @@ export function getEmailCode(data) {
   })
 }
 
-export function getPhoneCode() {
+export function getPhoneCode(data) {
   return request({
     url:'/system/phone/code',
+    params: data
   })
 }
 export function getPolicy(data) {
@@ -27,8 +28,8 @@ export function changeUserEmail(data) {
 }
 export function changeUserPhone(data) {
   return request({
-    url:'/system/user/phone/change',
-    method: "POST",
+    url:'/users/phone/update',
+    method: "PUT",
     data
   })
 }

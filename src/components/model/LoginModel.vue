@@ -43,10 +43,11 @@
               block
               color="blue"
               style="color:#fff"
-              @click="login"
+              id="captcha-button"
           >
             登录
           </v-btn>
+          <div id="captcha-element"></div>
           <!-- 注册和找回密码 -->
           <div class="mt-10 login-tip">
             <span @click="openRegister">立即注册</span>
@@ -76,10 +77,9 @@
     </v-card>
   </v-dialog>
 </template>
-
 <script>
 import state from "@/store/state";
-import {computed, onMounted, reactive, ref, toRefs, watch} from "vue";
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch} from "vue";
 import store from "@/store";
 import {homeLogin} from "@/network/login";
 import {ElMessage} from "element-plus";
@@ -115,6 +115,25 @@ export default {
       passwordRequired: value => !!value || "密码不能为空！",
       checkEmail: () => /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(stat.username) || "邮箱格式不正确！",
     }
+    let captcha;
+
+    function getInstance(instance) {
+      captcha = instance;
+    }
+
+    // 绑定验证码实例函数。该函数为固定写法，无需修改
+    const captchaVerifyCallback = async (captchaVerifyParam) =>{
+      console.log(captchaVerifyParam);
+      return {
+        captchaResult: true,
+        bizResult: true,
+      }
+    }
+    const onBizResultCallback = (bizResult) => {
+      console.log(bizResult)
+    }
+    // 业务请求验证结果回调函数
+
     const login = async () => {
       const {valid} = await form.value.validate()
       if (valid) {
@@ -122,24 +141,45 @@ export default {
           username: stat.username,
           password: stat.password
         }
-        homeLogin(data).then(res => {
-          if (res.flag) {
-            store.commit("login", res.data.userInfo)
-            ElMessage.success("登录成功！")
-            stat.username = ""
-            stat.password = ""
-            closeLogin()
-          } else {
-            ElMessage({
-              type: 'error',
-              message: res.message
-            })
-          }
-        })
+        // captcha.show()
+        // captcha.show()
+        // homeLogin(data).then(res => {
+        //   if (res.flag) {
+        //     store.commit("login", res.data.userInfo)
+        //     ElMessage.success("登录成功！")
+        //     stat.username = ""
+        //     stat.password = ""
+        //     closeLogin()
+        //   } else {
+        //     ElMessage({
+        //       type: 'error',
+        //       message: res.message
+        //     })
+        //   }
+        // })
       }
     }
-    onMounted(() => {
-
+    onMounted(()=>{
+      window.initAliyunCaptcha({
+        SceneId: '8mbprfkc', // 场景ID。根据步骤二新建验证场景后，您可以在验证码场景列表，获取该场景的场景ID
+        prefix: 'c76vu2', // 身份标。开通阿里云验证码2.0后，您可以在控制台概览页面的实例基本信息卡片区域，获取身份标
+        mode: 'popup', // 验证码模式。popup表示要集成的验证码模式为弹出式。无需修改
+        element: '#captcha-element', //页面上预留的渲染验证码的元素，与原代码中预留的页面元素保持一致。
+        button: '#captcha-button',
+        captchaVerifyCallback: captchaVerifyCallback, // 业务请求(带验证码校验)回调函数，无需修改
+        onBizResultCallback: onBizResultCallback, // 业务请求结果回调函数，无需修改
+        getInstance: getInstance, // 绑定验证码实例函数，无需修改
+        slideStyle: {
+          width: 360,
+          height: 40,
+        },
+        language: 'cn',
+        region: 'cn'
+      });
+    })
+    onBeforeUnmount(() => {
+      document.getElementById('aliyunCaptcha-mask')?.remove();
+      document.getElementById('aliyunCaptcha-window-popup')?.remove();
     })
     return {
       ...toRefs(stat),
