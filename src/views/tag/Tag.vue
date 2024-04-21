@@ -22,33 +22,37 @@
 </template>
 
 <script>
+import {computed, onMounted, reactive, toRefs} from "vue";
+import store from "@/store";
+import {getHomeTag} from "@/network/tag";
+
 export default {
-  created() {
-    this.listTags();
-  },
-  data: function() {
-    return {
+  setup() {
+    let stat = reactive({
       tagList: [],
       count: 0
-    };
-  },
-  methods: {
-    listTags() {
-      this.axios.get("/api/tags").then(({ data }) => {
-        this.tagList = data.data.recordList;
-        this.count = data.data.count;
-      });
-    }
-  },
-  computed: {
-    cover() {
-      var cover = "";
-      this.$store.state.blogInfo.pageList.forEach(item => {
+    })
+    const cover = computed(() => {
+      let cover = "";
+      store.state.blogInfo.pageList.forEach(item => {
         if (item.pageLabel == "tag") {
           cover = item.pageCover;
         }
       });
       return "background: url(" + cover + ") center center / cover no-repeat";
+    })
+    const listTags = () => {
+      getHomeTag().then(res=>{
+        stat.tagList = res.data.recordList
+        stat.count = res.data.count
+      })
+    }
+    onMounted(()=>{
+      listTags()
+    })
+    return {
+      ...toRefs(stat),
+      cover
     }
   }
 };

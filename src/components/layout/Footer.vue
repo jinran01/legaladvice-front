@@ -1,9 +1,8 @@
 <template>
-
   <v-footer app padless absolute v-if="!isMessage" style="z-index: 998">
     <div class="footer-wrap">
       <div>
-        ©{{ formatDate(blogInfo.websiteConfig.websiteCreateTime, "YYYY") }} -
+        ©
         {{ new Date().getFullYear() }} By
         {{ blogInfo.websiteConfig.websiteAuthor }}
       </div>
@@ -19,13 +18,16 @@
 <script>
 import store from "@/store";
 import {formatDate} from "@/common/js/formatDate";
-import {useRoute, useRouter} from "vue-router";
-import {ref, watch} from "vue";
+import {useRoute} from "vue-router";
+import {computed, ref, watch} from "vue";
 
 export default {
   name: 'Footer',
   setup() {
-    let blogInfo = store.state.blogInfo
+    // let blogInfo = store.getters.getBlogInfo
+    const blogInfo = computed(()=>{
+      return store.getters.getBlogInfo
+    })
     let route = useRoute();
     let isMessage = ref(false)
     watch(route, (to) => {

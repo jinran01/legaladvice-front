@@ -13,30 +13,30 @@
           <span class="typed-cursor">|</span>
         </div>
         <!-- 联系方式 -->
-        <div class="blog-contact">
-          <a
-              v-if="isShowSocial('qq')"
-              class="mr-5 iconfont iconqq"
-              target="_blank"
-              :href="
-              'http://wpa.qq.com/msgrd?v=3&uin=' +
-                blogInfo.websiteConfig.qq +
-                '&site=qq&menu=yes'
-            "
-          />
-          <a
-              v-if="isShowSocial('github')"
-              target="_blank"
-              :href="blogInfo.websiteConfig.github"
-              class="mr-5 iconfont icongithub"
-          />
-          <a
-              v-if="isShowSocial('gitee')"
-              target="_blank"
-              :href="blogInfo.websiteConfig.gitee"
-              class="iconfont icongitee-fill-round"
-          />
-        </div>
+<!--        <div class="blog-contact">-->
+<!--          <a-->
+<!--              v-if="isShowSocial('qq')"-->
+<!--              class="mr-5 iconfont iconqq"-->
+<!--              target="_blank"-->
+<!--              :href="-->
+<!--              'http://wpa.qq.com/msgrd?v=3&uin=' +-->
+<!--                blogInfo.websiteConfig.qq +-->
+<!--                '&site=qq&menu=yes'-->
+<!--            "-->
+<!--          />-->
+<!--          <a-->
+<!--              v-if="isShowSocial('github')"-->
+<!--              target="_blank"-->
+<!--              :href="blogInfo.websiteConfig.github"-->
+<!--              class="mr-5 iconfont icongithub"-->
+<!--          />-->
+<!--          <a-->
+<!--              v-if="isShowSocial('gitee')"-->
+<!--              target="_blank"-->
+<!--              :href="blogInfo.websiteConfig.gitee"-->
+<!--              class="iconfont icongitee-fill-round"-->
+<!--          />-->
+<!--        </div>-->
       </div>
       <!-- 向下滚动 -->
       <div class="scroll-down" @click="scrollDown">
@@ -46,7 +46,6 @@
       </div>
     </div>
     <!-- 主页文章 -->
-
     <v-row v-infinite-scroll="infiniteHandler" :infinite-scroll-disabled="disabled" class="home-container">
       <v-col md="9" cols="12">
           <!-- 说说轮播 -->

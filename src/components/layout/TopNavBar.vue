@@ -2,11 +2,6 @@
   <v-app-bar app :class="`${navClass} ${flag?'fade_in':'fade_out'}`" flat height="60">
     <!-- 手机端导航栏 -->
     <div class="d-md-none nav-mobile-container">
-      <!--      <div style="font-size:18px;font-weight:bold">-->
-      <!--        <router-link to="/">-->
-      <!--          {{ blogInfo.websiteConfig.websiteAuthor }}-->
-      <!--        </router-link>-->
-      <!--      </div>-->
       <div style="margin-left:auto">
         <a @click="openSearch"><i class="iconfont iconsousuo"/></a>
         <a @click="openDrawer" style="margin-left:10px;font-size:20px">
@@ -157,7 +152,7 @@
 
 <script>
 import store from "@/store";
-import {computed, onMounted, reactive, ref, toRefs, watch} from "vue";
+import {computed, ref, toRefs, watch} from "vue";
 import state from "@/store/state";
 import {homeLogout} from "@/network/login";
 import {ElMessage} from "element-plus";
@@ -173,18 +168,9 @@ export default {
       return state
     }
   },
-  props: {
-    blogInfo: {
-      type: Object,
-    }
-  },
-  setup(props) {
+  setup() {
     let navClass = ref('nav')
     let flag = ref(false)
-    let blogInfo = store.state.blogInfo || props.blogInfo
-    // let state = reactive({
-    //   scrollTop: 0
-    // })
     const openLogin = () => {
       store.commit("setLoginFlag", true)
     }
@@ -230,7 +216,6 @@ export default {
       ...toRefs(state),
       getScrollTop,
       navClass,
-      blogInfo,
       flag,
       logout,
       openLogin,

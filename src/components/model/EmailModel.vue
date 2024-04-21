@@ -84,7 +84,6 @@ export default {
     }
     //发送验证码
     const sendCode = () => {
-      console.log(stat.email)
       getEmailCode({username: stat.email}).then(res => {
         if (res.flag) {
           ElMessage.success("发送成功")

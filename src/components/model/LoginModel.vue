@@ -37,17 +37,18 @@
               <span style="color: #1976d2">密码</span>
             </template>
           </v-text-field>
+          <div id="test" class="nc-container"></div>
           <!-- 按钮 -->
           <v-btn
               class="mt-7"
               block
               color="blue"
               style="color:#fff"
+              @click="login"
               id="captcha-button"
           >
             登录
           </v-btn>
-          <div id="captcha-element"></div>
           <!-- 注册和找回密码 -->
           <div class="mt-10 login-tip">
             <span @click="openRegister">立即注册</span>
@@ -115,25 +116,6 @@ export default {
       passwordRequired: value => !!value || "密码不能为空！",
       checkEmail: () => /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(stat.username) || "邮箱格式不正确！",
     }
-    let captcha;
-
-    function getInstance(instance) {
-      captcha = instance;
-    }
-
-    // 绑定验证码实例函数。该函数为固定写法，无需修改
-    const captchaVerifyCallback = async (captchaVerifyParam) =>{
-      console.log(captchaVerifyParam);
-      return {
-        captchaResult: true,
-        bizResult: true,
-      }
-    }
-    const onBizResultCallback = (bizResult) => {
-      console.log(bizResult)
-    }
-    // 业务请求验证结果回调函数
-
     const login = async () => {
       const {valid} = await form.value.validate()
       if (valid) {
@@ -141,45 +123,54 @@ export default {
           username: stat.username,
           password: stat.password
         }
-        // captcha.show()
-        // captcha.show()
-        // homeLogin(data).then(res => {
-        //   if (res.flag) {
-        //     store.commit("login", res.data.userInfo)
-        //     ElMessage.success("登录成功！")
-        //     stat.username = ""
-        //     stat.password = ""
-        //     closeLogin()
-        //   } else {
-        //     ElMessage({
-        //       type: 'error',
-        //       message: res.message
-        //     })
-        //   }
+        // var nc_token = ["FFFF0N0000000000B208", (new Date()).getTime(), Math.random()].join(':');
+        // var NC_Opt =
+        //     {
+        //       renderTo: "#test",
+        //       appkey: "FFFF0N0000000000B208",
+        //       scene: "nc_login",
+        //       token: nc_token,
+        //       customWidth: 300,
+        //       trans:{"key1":"code0"},
+        //       elementID: ["test"],
+        //       is_Opt: 0,
+        //       language: "cn",
+        //       isEnabled: true,
+        //       timeout: 3000,
+        //       times:5,
+        //       callback: function (data) {
+        //         window.console && console.log(nc_token)
+        //         window.console && console.log(data.csessionid)
+        //         window.console && console.log(data.sig)
+        //       }
+        //     }
+        // var nc = new noCaptcha(NC_Opt)
+        // nc.upLang('cn', {
+        //   _startTEXT: "请按住滑块，拖动到最右边",
+        //   _yesTEXT: "验证通过",
+        //   _error300: "哎呀，出错了，点击<a href=\"javascript:__nc.reset()\">刷新</a>再来一次",
+        //   _errorNetwork: "网络不给力，请<a href=\"javascript:__nc.reset()\">点击刷新</a>",
         // })
+        homeLogin(data).then(res => {
+          if (res.flag) {
+            store.commit("login", res.data.userInfo)
+            closeLogin()
+            ElMessage.success("登录成功！")
+            stat.username = ""
+            stat.password = ""
+          } else {
+            ElMessage({
+              type: 'error',
+              message: res.message
+            })
+          }
+        })
       }
     }
     onMounted(()=>{
-      window.initAliyunCaptcha({
-        SceneId: '8mbprfkc', // 场景ID。根据步骤二新建验证场景后，您可以在验证码场景列表，获取该场景的场景ID
-        prefix: 'c76vu2', // 身份标。开通阿里云验证码2.0后，您可以在控制台概览页面的实例基本信息卡片区域，获取身份标
-        mode: 'popup', // 验证码模式。popup表示要集成的验证码模式为弹出式。无需修改
-        element: '#captcha-element', //页面上预留的渲染验证码的元素，与原代码中预留的页面元素保持一致。
-        button: '#captcha-button',
-        captchaVerifyCallback: captchaVerifyCallback, // 业务请求(带验证码校验)回调函数，无需修改
-        onBizResultCallback: onBizResultCallback, // 业务请求结果回调函数，无需修改
-        getInstance: getInstance, // 绑定验证码实例函数，无需修改
-        slideStyle: {
-          width: 360,
-          height: 40,
-        },
-        language: 'cn',
-        region: 'cn'
-      });
     })
+
     onBeforeUnmount(() => {
-      document.getElementById('aliyunCaptcha-mask')?.remove();
-      document.getElementById('aliyunCaptcha-window-popup')?.remove();
     })
     return {
       ...toRefs(stat),

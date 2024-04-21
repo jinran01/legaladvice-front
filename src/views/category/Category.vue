@@ -24,33 +24,38 @@
 </template>
 
 <script>
+import {computed, onMounted, reactive, toRefs} from "vue";
+import store from "@/store";
+import {getHomeCategory} from "@/network/category";
+
 export default {
-  created() {
-    this.listCategories();
-  },
-  data: function() {
-    return {
+  setup() {
+    let stat = reactive({
       categoryList: [],
       count: 0
-    };
-  },
-  methods: {
-    listCategories() {
-      this.axios.get("/api/categories").then(({ data }) => {
-        this.categoryList = data.data.recordList;
-        this.count = data.data.count;
-      });
-    }
-  },
-  computed: {
-    cover() {
-      var cover = "";
-      this.$store.state.blogInfo.pageList.forEach(item => {
+    })
+    const cover = computed(() => {
+      let cover = "";
+      store.state.blogInfo.pageList.forEach(item => {
         if (item.pageLabel == "category") {
           cover = item.pageCover;
         }
       });
       return "background: url(" + cover + ") center center / cover no-repeat";
+    })
+    const listCategories = () => {
+      getHomeCategory().then(res=>{
+        stat.categoryList = res.data.recordList
+        stat.count = res.data.count
+      })
+    }
+    onMounted(()=>{
+      listCategories()
+    })
+    return {
+      ...toRefs(stat),
+      listCategories,
+      cover
     }
   }
 };

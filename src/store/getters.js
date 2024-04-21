@@ -1,6 +1,9 @@
 import state from "@/store/state";
 
 const getters = {
+    getBlogInfo(state){
+        return state.blogInfo
+    },
     getLoginFlag(state){
         return state.loginFlag
     },

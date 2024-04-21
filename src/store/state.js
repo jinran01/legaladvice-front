@@ -1,7 +1,12 @@
 let state = {
   drawer:false,
   scrollTop:0,
-  blogInfo: null,
+  blogInfo: {
+    websiteConfig:{
+      websiteAuthor: "",
+      websiteRecordNo: ""
+    }
+  },
   searchFlag: false,
   loginFlag: false,
   registerFlag: false,

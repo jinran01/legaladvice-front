@@ -1,13 +1,13 @@
 <template>
   <v-app>
     <!-- 导航栏 -->
-    <TopNavBar :blogInfo="blogInfo"></TopNavBar>
+    <TopNavBar></TopNavBar>
     <!-- 侧边导航栏 -->
-    <SideNavBar />
+    <SideNavBar/>
     <v-main style="margin-bottom: 30px">
       <router-view :key="$route.fullPath"/>
     </v-main>
-    <Footer ></Footer>
+    <Footer></Footer>
     <BackTop></BackTop>
     <!-- 登录模态框 -->
     <LoginModel></LoginModel>
@@ -58,31 +58,26 @@ export default {
     TopNavBar,
     BackTop,
   },
-  setup(){
-    let blogInfo = ref()
-    onBeforeMount(()=>{
-      setTimeout(()=>{
-        getHomeInfo().then(res=>{
-          if (res.flag){
-            blogInfo.value = res.data
-            store.commit("setBlogInfo",res.data)
-          }else {
-            ElMessage({
-              type:'error',
-              message:'出错了'
-            })
-          }
-        })
+  setup() {
+    onBeforeMount(async () => {
+      await getHomeInfo().then(res => {
+        if (res.flag) {
+          store.commit("setBlogInfo", res.data)
+        } else {
+          ElMessage({
+            type: 'error',
+            message: '出错了'
+          })
+        }
       })
     })
-    return{
-      blogInfo,
+    return {
     }
   }
 }
 </script>
 <style scoped lang="less">
-footer{
+footer {
   width: 100%;
   padding: 0;
 }

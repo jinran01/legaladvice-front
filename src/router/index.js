@@ -7,7 +7,7 @@ const Article = () => import("@/views/article/Article")
 const ArticleList = () => import("@/views/article/ArticleList")
 const Category = () => import("@/views/category/Category")
 const User = () => import("@/views/user/User")
-// const x = () => import()
+const Tag = () => import("@/views/tag/Tag")
 
 const routes = [
   {
@@ -56,7 +56,7 @@ const routes = [
   },
   {
     path: "/tags",
-    // component: resolve => require(["../views/tag/Tag.vue"], resolve),
+    component: Tag,
     meta: {
       title: "标签"
     }
@@ -74,7 +74,7 @@ const routes = [
   },
   {
     path: "/tags/:tagId",
-    // component: resolve => require(["../views/article/ArticleList.vue"], resolve)
+    component: ArticleList
   },
   {
     path: "/links",
