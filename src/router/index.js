@@ -8,7 +8,8 @@ const ArticleList = () => import("@/views/article/ArticleList")
 const Category = () => import("@/views/category/Category")
 const User = () => import("@/views/user/User")
 const Tag = () => import("@/views/tag/Tag")
-
+const Lawyer = () => import("@/views/lawyer/Lawyer")
+const Consult = () => import("@/views/consult/Consult")
 const routes = [
   {
     path: '/',
@@ -88,6 +89,20 @@ const routes = [
     // component: resolve => require(["../views/about/About.vue"], resolve),
     meta: {
       title: "关于我"
+    }
+  },
+  {
+    path: "/lawyer",
+    component: Lawyer,
+    meta: {
+      title: "律师"
+    }
+  },
+  {
+    path: "/consult",
+    component: Consult,
+    meta: {
+      title: "律师咨询"
     }
   },
   {

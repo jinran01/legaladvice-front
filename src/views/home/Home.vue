@@ -162,30 +162,30 @@
               加入书签
             </a>
             <!-- 社交信息 -->
-            <div class="card-info-social">
-              <a
-                  v-if="isShowSocial('qq')"
-                  class="mr-5 iconfont iconqq"
-                  target="_blank"
-                  :href="
-                  'http://wpa.qq.com/msgrd?v=3&uin=' +
-                    blogInfo.websiteConfig.qq +
-                    '&site=qq&menu=yes'
-                "
-              />
-              <a
-                  v-if="isShowSocial('github')"
-                  target="_blank"
-                  :href="blogInfo.websiteConfig.github"
-                  class="mr-5 iconfont icongithub"
-              />
-              <a
-                  v-if="isShowSocial('gitee')"
-                  target="_blank"
-                  :href="blogInfo.websiteConfig.gitee"
-                  class="iconfont icongitee-fill-round"
-              />
-            </div>
+<!--            <div class="card-info-social">-->
+<!--              <a-->
+<!--                  v-if="isShowSocial('qq')"-->
+<!--                  class="mr-5 iconfont iconqq"-->
+<!--                  target="_blank"-->
+<!--                  :href="-->
+<!--                  'http://wpa.qq.com/msgrd?v=3&uin=' +-->
+<!--                    blogInfo.websiteConfig.qq +-->
+<!--                    '&site=qq&menu=yes'-->
+<!--                "-->
+<!--              />-->
+<!--              <a-->
+<!--                  v-if="isShowSocial('github')"-->
+<!--                  target="_blank"-->
+<!--                  :href="blogInfo.websiteConfig.github"-->
+<!--                  class="mr-5 iconfont icongithub"-->
+<!--              />-->
+<!--              <a-->
+<!--                  v-if="isShowSocial('gitee')"-->
+<!--                  target="_blank"-->
+<!--                  :href="blogInfo.websiteConfig.gitee"-->
+<!--                  class="iconfont icongitee-fill-round"-->
+<!--              />-->
+<!--            </div>-->
           </v-card>
           <!-- 网站信息 -->
           <v-card class="blog-card animated zoomIn mt-5 big">
@@ -332,9 +332,9 @@ export default {
       const data = obj;
       const typed = new EasyTyper(data, input, null, null);
     }
-    const isShowSocial = (type) => {
-      return blogInfo.websiteConfig.socialUrlList.indexOf(type) >= 0 ? true : false
-    }
+    // const isShowSocial = (type) => {
+    //   return blogInfo.websiteConfig.socialUrlList.indexOf(type) >= 0 ? true : false
+    // }
     //计时器
     const runTime = () => {
       let timeold =
@@ -377,7 +377,7 @@ export default {
       formatDate,
       disabled,
       loading,
-      isShowSocial,
+      // isShowSocial,
       scrollDown,
       isRight,
       // infiniteHandler

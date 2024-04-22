@@ -133,7 +133,7 @@
                 </v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <v-list-item-title style="cursor: pointer" @click="logout">
+                <v-list-item-title style="cursor: pointer" @click="toAuthentication">
                   <i class="iconfont icondenglu"/> 律师认证
                 </v-list-item-title>
               </v-list-item>
@@ -175,6 +175,9 @@ export default {
       store.commit("setLoginFlag", true)
     }
 
+    const toAuthentication = () => {
+
+    }
     //退出
     const logout = () => {
       homeLogout().then(res=>{
@@ -221,6 +224,7 @@ export default {
       openLogin,
       openSearch,
       openDrawer,
+      toAuthentication,
     }
   },
 };
