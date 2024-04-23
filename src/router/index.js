@@ -10,6 +10,8 @@ const User = () => import("@/views/user/User")
 const Tag = () => import("@/views/tag/Tag")
 const Lawyer = () => import("@/views/lawyer/Lawyer")
 const Consult = () => import("@/views/consult/Consult")
+const LawyerAuth = () => import("@/views/user/LawyerAuth")
+
 const routes = [
   {
     path: '/',
@@ -23,38 +25,38 @@ const routes = [
     path: "/articles/:id",
     component: Article
   },
-  {
-    path: "/archives",
-    // component: resolve => require(["../views/archive/Archive.vue"], resolve),
-    meta: {
-      title: "归档"
-    }
-  },
-  {
-    path: "/albums",
-    // component: resolve => require(["../views/album/Album.vue"], resolve),
-    meta: {
-      title: "相册"
-    }
-  },
-  {
-    path: "/talks",
-    // component: resolve => require(["../views/talk/Talk.vue"], resolve),
-    meta: {
-      title: "说说"
-    }
-  },
-  {
-    path: "/talks/:talkId",
-    // component: resolve => require(["../views/talk/TalkInfo.vue"], resolve),
-    meta: {
-      title: "说说"
-    }
-  },
-  {
-    path: "/albums/:albumId",
-    // component: resolve => require(["../views/album/Photo.vue"], resolve)
-  },
+  // {
+  //   path: "/archives",
+  //   // component: resolve => require(["../views/archive/Archive.vue"], resolve),
+  //   meta: {
+  //     title: "归档"
+  //   }
+  // },
+  // {
+  //   path: "/albums",
+  //   // component: resolve => require(["../views/album/Album.vue"], resolve),
+  //   meta: {
+  //     title: "相册"
+  //   }
+  // },
+  // {
+  //   path: "/talks",
+  //   // component: resolve => require(["../views/talk/Talk.vue"], resolve),
+  //   meta: {
+  //     title: "说说"
+  //   }
+  // },
+  // {
+  //   path: "/talks/:talkId",
+  //   // component: resolve => require(["../views/talk/TalkInfo.vue"], resolve),
+  //   meta: {
+  //     title: "说说"
+  //   }
+  // },
+  // {
+  //   path: "/albums/:albumId",
+  //   // component: resolve => require(["../views/album/Photo.vue"], resolve)
+  // },
   {
     path: "/tags",
     component: Tag,
@@ -78,19 +80,19 @@ const routes = [
     component: ArticleList
   },
   {
-    path: "/links",
-    // component: resolve => require(["../views/link/Link.vue"], resolve),
+    path: "/lawyer/auth",
+    component: LawyerAuth,
     meta: {
-      title: "友链列表"
+      title: "律师认证"
     }
   },
-  {
-    path: "/about",
-    // component: resolve => require(["../views/about/About.vue"], resolve),
-    meta: {
-      title: "关于我"
-    }
-  },
+  // {
+  //   path: "/about",
+  //   // component: resolve => require(["../views/about/About.vue"], resolve),
+  //   meta: {
+  //     title: "关于我"
+  //   }
+  // },
   {
     path: "/lawyer",
     component: Lawyer,
@@ -119,14 +121,14 @@ const routes = [
       title: "个人中心"
     }
   },
-  {
-    path: "/oauth/login/qq",
-    // component: resolve => require(["../components/OauthLogin.vue"], resolve)
-  },
-  {
-    path: "/oauth/login/weibo",
-    // component: resolve => require(["../components/OauthLogin.vue"], resolve)
-  }
+  // {
+  //   path: "/oauth/login/qq",
+  //   // component: resolve => require(["../components/OauthLogin.vue"], resolve)
+  // },
+  // {
+  //   path: "/oauth/login/weibo",
+  //   // component: resolve => require(["../components/OauthLogin.vue"], resolve)
+  // }
 ]
 
 const router = createRouter({

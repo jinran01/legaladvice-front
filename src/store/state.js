@@ -5,7 +5,8 @@ let state = {
     websiteConfig:{
       websiteAuthor: "",
       websiteRecordNo: ""
-    }
+    },
+    pageList:[]
   },
   searchFlag: false,
   loginFlag: false,

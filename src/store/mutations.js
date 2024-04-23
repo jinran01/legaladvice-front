@@ -17,6 +17,9 @@ const mutations = {
   setPhoneFlag(state,data){
     state.phoneFlag = data
   },
+  setAvatar(state,data){
+    state.avatar = data
+  },
   setArticleLike(state,articleId){
     let articleLikeSet = state.articleLikeSet;
     if (articleLikeSet.indexOf(articleId) != -1) {

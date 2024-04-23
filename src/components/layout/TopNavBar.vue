@@ -92,8 +92,8 @@
           </v-menu>
         </div>
         <div class="menus-item">
-          <router-link class="menu-btn" to="/links">
-            <i class="iconfont iconlianjie"/> 友链
+          <router-link class="menu-btn" to="/consult">
+            <i class="iconfont iconlianjie"/> 咨询
           </router-link>
         </div>
         <div class="menus-item">
@@ -133,8 +133,10 @@
                 </v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <v-list-item-title style="cursor: pointer" @click="toAuthentication">
-                  <i class="iconfont icondenglu"/> 律师认证
+                <v-list-item-title>
+                  <router-link to="/lawyer/auth" style="color: #4c4948">
+                    <i class="iconfont icondenglu"/> 律师认证
+                  </router-link>
                 </v-list-item-title>
               </v-list-item>
               <v-list-item>
@@ -173,10 +175,6 @@ export default {
     let flag = ref(false)
     const openLogin = () => {
       store.commit("setLoginFlag", true)
-    }
-
-    const toAuthentication = () => {
-
     }
     //退出
     const logout = () => {
@@ -224,7 +222,6 @@ export default {
       openLogin,
       openSearch,
       openDrawer,
-      toAuthentication,
     }
   },
 };

@@ -47,7 +47,7 @@
             <v-btn v-if="userInfo.phone" style="top: 10px" text small @click="openPhoneModel">
               修改绑定
             </v-btn>
-            <v-btn v-else  style="top: 10px" text small @click="openPhoneModel">
+            <v-btn v-else style="top: 10px" text small @click="openPhoneModel">
               绑定手机号
             </v-btn>
           </div>
@@ -82,10 +82,8 @@ import {userInfoUpdate} from "@/network/login";
 import {ElMessage} from "element-plus";
 import {getPolicy} from "@/network/system";
 import {v4} from "uuid";
-import axios, {head} from "axios";
 
 export default {
-
   components: {AvatarCropper},
   setup() {
     let userInfo = reactive({
@@ -97,12 +95,12 @@ export default {
     })
     let show = ref(false)
     //请求oss 数据
-    let data = ref({
+    let data = {
       key: '',
       policy: '',
       OSSAccessKeyId: '',
       signature: '',
-    })
+    }
     const changeAvatar = () => {
       show.value = true
     }
@@ -132,23 +130,35 @@ export default {
     }
     //上传前
     const before_upload = (file) => {
-      // let types = ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]
       let type = file.name.split(".")
       type = type[type.length - 1]
-      // return  new Promise((resolve, reject)=>{
-      //   getPolicy({path: "avatar"}).then(res => {
-      //     data.value.OSSAccessKeyId = res.data.accessKeyId
-      //     data.value.signature = res.data.signature
-      //     data.value.policy = res.data.policy
-      //     data.value.key = res.data.dir + v4() + "." + type
-      //     setTimeout(()=>{
-      //       resolve(file)
-      //     },5000)
-      //   })
-      // })
+      if (file.size > 10 * 1024 * 1024) {
+        ElMessage.error('最大支持 10MB 文件')
+        return Promise.reject('最大支持 10MB 文件')
+      }
+      return new Promise((resolve, reject) => {
+        getPolicy({path: 'avatar'}).then(res => {
+          data.signature = res.data.signature
+          data.policy = res.data.policy
+          data.OSSAccessKeyId = res.data.accessKeyId
+          data.key = res.data.dir + v4() + "." + type
+        })
+        setTimeout(() => {
+          resolve(file)
+        }, 2000)
+      })
     }
+
     const avatar_success = () => {
-      store.state.avatar = "https://legaladvice.oss-cn-beijing.aliyuncs.com/" + data.value.key
+      let avatar = ref("https://legaladvice.oss-cn-beijing.aliyuncs.com/" + data.key)
+      userInfoUpdate({avatar:avatar.value}).then(res=>{
+        if (res.flag){
+          ElMessage.success("修改成功！")
+        }
+      })
+      store.commit("setAvatar",avatar)
+      // store.state.avatar = avatar
+      userInfo.avatar = store.state.avatar
     }
     const loginType = computed(() => {
       return store.state.loginType
