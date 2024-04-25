@@ -188,7 +188,7 @@ p {
    }
   .lawyer-container {
     animation: main 1s;
-    max-width: 970px;
+    max-width: 85%;
     padding: 50px 40px;
     margin: 380px auto 40px auto;
   }
@@ -240,7 +240,7 @@ p {
    }
   .lawyer-container {
     animation: main 1s;
-    max-width: 970px;
+    max-width: 85%;
     padding: 50px 40px;
     margin: 380px auto 40px auto;
   }
