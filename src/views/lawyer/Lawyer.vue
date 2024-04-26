@@ -30,7 +30,7 @@
             </div>
           </v-col>
           <v-col cols="6" style="padding: 0px;display: flex;align-items: center;justify-content: right">
-            <el-button type="success" style="margin-right: 20px;">咨询</el-button>
+            <el-button type="success" style="margin-right: 20px;" @click="consult(item)">咨询</el-button>
           </v-col>
         </v-row>
       </el-card>
@@ -43,6 +43,7 @@ import {computed, onMounted, reactive, ref} from "vue";
 import store from "@/store";
 import {getHomeLawyer} from "@/network/lawyer";
 import {ElMessage} from "element-plus";
+import router from "@/router";
 
 export default {
   name: "Lawyer",
@@ -52,6 +53,20 @@ export default {
       current:1,
       size:10
     })
+    const consult = (data) => {
+      let lawyerList = JSON.parse(localStorage.getItem("consult_lawyer")) ? JSON.parse(localStorage.getItem("consult_lawyer")) : []
+      if (lawyerList.length != 0){
+        for (let i = 0; i < lawyerList.length; i++) {
+          if (lawyerList[i].userAuthId == data.userAuthId){
+            lawyerList.splice(i,1)
+            break
+          }
+        }
+      }
+      lawyerList.unshift(data)
+      localStorage.setItem("consult_lawyer",JSON.stringify(lawyerList))
+      router.push("/consult")
+    }
     const getLawyerList = () => {
       getHomeLawyer(pageInfo).then(res=>{
         if (res.flag){
@@ -76,6 +91,7 @@ export default {
     return {
       cover,
       lawyerList,
+      consult,
     }
   },
 }

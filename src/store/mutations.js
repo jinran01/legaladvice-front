@@ -41,7 +41,8 @@ const mutations = {
     state.intro = data.intro
   },
   login(state, user) {
-    state.userId = user.userInfoId;
+    state.userId = user.id
+    state.userInfoId = user.userInfoId;
     state.avatar = user.avatar;
     state.nickname = user.nickname;
     state.phone = user.phone;

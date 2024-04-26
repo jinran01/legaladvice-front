@@ -5,79 +5,148 @@
   </div>
   <!-- 咨询室 -->
   <v-card class="lawyer-container">
-    <v-layout class="rounded rounded-md">
-      <v-navigation-drawer style="width: 200px;">
+    <el-container class="chat-room-main">
+      <el-aside width="200px">
         <v-list>
-          <v-list-item class="lawyerList">
-            <div class="list_item">
+          <v-list-item class="lawyerList" v-for="item in consultLawyerList">
+            <div class="list_item" @click="onLawyerConsult(item)">
               <v-avatar class="lawyer_avatar">
-                <img src="https://legaladvice.oss-cn-beijing.aliyuncs.com/avatar/847816e3-7147-4b30-97d3-df47ed2caecd.jpg">
+                <img :src="item.avatar">
               </v-avatar>
-              <span>陈律</span>
+              <span style="margin-left: 10px;">{{ item.name }}</span>
             </div>
           </v-list-item>
         </v-list>
-      </v-navigation-drawer>
-
-      <v-app-bar class="consult_top" style="justify-content: center;height: 50px;left: 200px;width: calc(100% - 200px);" title="某某律师"></v-app-bar>
-
-      <v-main class="d-flex align-center justify-center" style="--v-layout-left: 200px;">
-        Main Content
-      </v-main>
-    </v-layout>
+      </el-aside>
+      <el-container>
+        <el-header style="display:flex;justify-content: center;font-size: 20px">{{ stat.title }}</el-header>
+        <el-main style="overflow-y: hidden;padding-bottom: 10px;padding-top: 0px;">
+          <div class="chat-main">
+            <div class="chat-room">111</div>
+            <div class="chat-content">
+              <div style="height: 25px">111</div>
+              <div style="height: calc(100% - 25px)">
+                <textarea
+                    class="context"
+                    placeholder=""
+                    auto-grow
+                    dense
+                    style="outline: none;resize: none;"
+                    v-model="stat.content"
+                ></textarea>
+              </div>
+            </div>
+            <el-button style="float: right" @click="sendMessage">发送</el-button>
+          </div>
+        </el-main>
+      </el-container>
+    </el-container>
   </v-card>
 </template>
 
 <script>
-import {reactive} from "vue";
+import {onMounted, reactive, ref, toRef, toRefs} from "vue";
 import store from "@/store";
 
 export default {
   name: "Consult",
-  setup(){
+  setup() {
+    let consultLawyerList = ref([])
+    let chatRecordList = ref([])
     let stat = reactive({
-      webSocket:null,
-      userInfoId: store.state.userId
+      toUserId:0,
+      title: "",
+      webSocket: null,
+      content:"",
+      userId: store.state.userId
     })
-    stat.webSocket = new WebSocket("ws://localhost:8080/websocket/single/"+stat.userInfoId)
+    stat.webSocket = new WebSocket("ws://localhost:8080/websocket/single/" + stat.userId)
 
     const sendMessage = () => {
       let data = {
-        data:{toUserId:1}
+        type: 1,
+        data: {userId:stat.userId,toUserId: stat.toUserId,content:stat.content}
       }
+      console.log(data)
       stat.webSocket.send(JSON.stringify(data))
     }
-
-    return{
+    //更换聊天对象
+    const onLawyerConsult = (item) => {
+      stat.title = item.name
+      stat.toUserId = item.userAuthId
+    }
+    const getConsultLawyerList = () => {
+      let list = JSON.parse(localStorage.getItem("consult_lawyer")) ? JSON.parse(localStorage.getItem("consult_lawyer")) : []
+      for (let i = 0; i < list.length; i++) {
+        consultLawyerList.value.push(list[i])
+      }
+      stat.title = consultLawyerList.value[0].name
+    }
+    onMounted(() => {
+      getConsultLawyerList()
+    })
+    return {
+      stat,
+      consultLawyerList,
+      chatRecordList,
       sendMessage,
+      onLawyerConsult,
     }
   }
 }
 </script>
 
 <style scoped lang="less">
-.lawyer-container{
+.lawyer-container {
   width: 90%;
 }
-.lawyerList{
-  border: 1px solid red;
+
+.lawyerList {
+  border-radius: 5px;
   padding: 0px;
-  .list_item{
+  margin: 5px;
+  box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 8px 1px;
+
+  .list_item {
     cursor: pointer;
-    .lawyer_avatar{
+
+    .lawyer_avatar {
       width: 50px;
       height: 50px;
-      img{
+
+      img {
         width: 100%;
         height: 100%;
       }
     }
   }
-  &:hover{
-    background: #00a1d6;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
   }
 }
-.rounded-md{
-  min-height: 600px;
+
+.chat-main {
+  height: 100%;
+  width: 100%;
+
+  .chat-room {
+    width: 100%;
+    height: 60%;
+  }
+
+  .chat-content {
+    width: 100%;
+    height: 35%;
+    border-top: 2px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+.chat-room-main {
+  min-height: 650px;
+}
+.context{
+  width: 100%;
+  height: 100%;
 }
 </style>
