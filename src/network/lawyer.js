@@ -19,3 +19,9 @@ export function getHomeLawyer(data){
     params: data
   })
 }
+
+export function getConsultUserList(){
+  return request({
+    url:'/chat/user/list',
+  })
+}

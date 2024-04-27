@@ -157,7 +157,6 @@ export default {
         }
       })
       store.commit("setAvatar",avatar)
-      // store.state.avatar = avatar
       userInfo.avatar = store.state.avatar
     }
     const loginType = computed(() => {

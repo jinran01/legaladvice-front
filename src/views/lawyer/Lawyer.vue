@@ -30,7 +30,12 @@
             </div>
           </v-col>
           <v-col cols="6" style="padding: 0px;display: flex;align-items: center;justify-content: right">
-            <el-button type="success" style="margin-right: 20px;" @click="consult(item)">咨询</el-button>
+            <el-button
+                type="success"
+                style="margin-right: 20px;"
+                @click="consult(item)"
+                :disabled="item.userAuthId === store.state.userId"
+            >咨询</el-button>
           </v-col>
         </v-row>
       </el-card>
@@ -54,7 +59,7 @@ export default {
       size:10
     })
     const consult = (data) => {
-      let lawyerList = JSON.parse(localStorage.getItem("consult_lawyer")) ? JSON.parse(localStorage.getItem("consult_lawyer")) : []
+      let lawyerList = JSON.parse(localStorage.getItem("consult_list")) ? JSON.parse(localStorage.getItem("consult_lawyer")) : []
       if (lawyerList.length != 0){
         for (let i = 0; i < lawyerList.length; i++) {
           if (lawyerList[i].userAuthId == data.userAuthId){
@@ -64,7 +69,7 @@ export default {
         }
       }
       lawyerList.unshift(data)
-      localStorage.setItem("consult_lawyer",JSON.stringify(lawyerList))
+      localStorage.setItem("consult_list",JSON.stringify(lawyerList))
       router.push("/consult")
     }
     const getLawyerList = () => {
@@ -91,6 +96,7 @@ export default {
     return {
       cover,
       lawyerList,
+      store,
       consult,
     }
   },

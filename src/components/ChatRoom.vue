@@ -212,7 +212,6 @@ export default {
       };
       // 连接成功建立的回调方法
       this.websocket.onopen = function(event) {
-        console.log(event);
         // 发送心跳消息
         that.heartBeat = setInterval(function() {
           let beatMessage = {
