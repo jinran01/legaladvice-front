@@ -17,6 +17,7 @@ let state = {
   phoneFlag: false,
   userInfoId: null,
   avatar: null,
+  name: null,
   nickname: null,
   phone: null,
   intro: null,

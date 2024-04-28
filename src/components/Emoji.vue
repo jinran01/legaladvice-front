@@ -30,10 +30,6 @@ export default {
     }
   },
   setup(props, context) {
-    // let stat = reactive({
-    //   current: 1,
-    //   size: 20,
-    // })
     let emojiList = ref({})
     const addEmoji = (key) => {
       context.emit("addEmoji", key)

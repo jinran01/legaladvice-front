@@ -44,6 +44,7 @@ const mutations = {
     state.userId = user.id
     state.userInfoId = user.userInfoId;
     state.avatar = user.avatar;
+    state.name = user.name;
     state.nickname = user.nickname;
     state.phone = user.phone;
     state.intro = user.intro;

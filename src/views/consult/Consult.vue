@@ -6,49 +6,73 @@
   <!-- 咨询室 -->
   <v-card class="lawyer-container">
     <el-container class="chat-room-main">
-      <el-aside width="200px">
+      <el-aside class="user-aside" width="200px">
         <v-list>
           <v-list-item class="lawyerList" v-for="item in consultLawyerList">
             <div class="list_item" @click="onLawyerConsult(item)">
               <v-avatar class="lawyer_avatar">
                 <img :src="item.avatar" style="width: 40px;height: 40px">
               </v-avatar>
-              <span style="margin-left: 10px;">{{ item.nickname }}</span>
+              <div class="name_message">
+                <span class="user_name" style="margin-left: 10px;">{{ item.name || item.nickname }}</span>
+                <span class="last_message" style="margin-left: 10px;">最新消息</span>
+              </div>
+              <span class="online" :style="{'background-color':isOnline(item.userAuthId) == true?'rgb(40,232,139)':'rgb(187,189,200)'}"></span>
             </div>
           </v-list-item>
         </v-list>
       </el-aside>
       <el-container>
-        <el-header style="display:flex;justify-content: center;font-size: 20px">{{ stat.title }}</el-header>
-        <el-main style="overflow-y: hidden;padding-bottom: 10px;padding-top: 0px;">
+        <el-header class="chat-header" style="display: grid">
+          <template v-slot:default>
+            {{ stat.title }}
+            <div style="display: flex;justify-content: center;font-size: 14px"
+                 :style="{'color':isOnline(stat.toUserId) == true?'rgb(40,232,139)':'rgb(187,189,200)'}">
+              {{isOnline(stat.toUserId) ? '在线' : '离线'}}
+            </div>
+          </template>
+        </el-header>
+        <el-main class="chat-container" style="overflow-y: hidden;padding-bottom: 0px;padding-top: 0px;">
           <div class="chat-main">
             <div class="chat-room" style="max-height: 350px">
-              <el-scrollbar>
-                <div
-                    v-for="(item, index) of chatRecordList"
-                    :key="index"
-                    :class="isMyMessage(item)"
-                >
-                  <!-- 头像 -->
-                  <img :class="isMyAvatar(item)" :src="item.avatar"/>
-                  <div>
-                    <div class="nickname" v-if="!isSelf(item)">
-                      {{ item.nickname }}
-                    </div>
-                    <!-- 内容 -->
-                    <div ref="content" :class="isMyContent(item)">
-                      <!-- 文字消息 -->
-                      <div v-html="item.content"/>
+              <el-scrollbar ref="scrollbarRef" v-loading="loading">
+                <div ref="innerRef" style="margin-top: 10px;">
+                  <div
+                      v-for="(item, index) of chatRecordList"
+                      :key="index"
+                      :class="isMyMessage(item)"
+                  >
+                    <!-- 头像 -->
+                    <img :class="isMyAvatar(item)" :src="item.avatar"/>
+                    <div>
+                      <div class="nickname" v-if="!isSelf(item)">
+                        {{ item.name || item.nickname }}
+                      </div>
+                      <!-- 内容 -->
+                      <div ref="content" :class="isMyContent(item)">
+                        <!-- 文字消息 -->
+                        <div v-html="item.content"/>
+                      </div>
                     </div>
                   </div>
                 </div>
               </el-scrollbar>
             </div>
             <div class="chat-content">
-              <div style="height: 25px">111</div>
+              <div style="height: 25px">
+                <i style="padding-left: 10px"
+                   class="iconfont iconbiaoqing emoji"
+                   :style="isEmoji ? 'color:#FFC83D' : ''"
+                   @click.prevent.stop="openEmoji"
+                />
+              </div>
               <div style="height: calc(100% - 25px)">
+                <div class="emoji-box" v-show="isEmoji">
+                  <Emoji :chooseEmoji="true" @addEmoji="addEmoji"></Emoji>
+                </div>
                 <textarea
                     class="context"
+                    ref="contentInput"
                     placeholder=""
                     auto-grow
                     dense
@@ -57,7 +81,7 @@
                 ></textarea>
               </div>
             </div>
-            <el-button style="float: right" @click="sendMessage">发送</el-button>
+            <el-button style="float: right;position: relative;bottom: 10px" @click="sendMessage">发送</el-button>
           </div>
         </el-main>
       </el-container>
@@ -66,14 +90,23 @@
 </template>
 
 <script>
-import {onBeforeUnmount, onMounted, onUnmounted, reactive, ref} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, reactive, ref} from "vue";
 import store from "@/store";
 import {getConsultUserList} from "@/network/lawyer";
 import {ElMessage} from "element-plus";
+import Emoji from "@/components/Emoji";
+import EmojiList from "@/assets/js/emoji";
 
 export default {
   name: "Consult",
+  components: {Emoji},
   setup() {
+    let loading = ref(false)
+    let isEmoji = ref(false)
+    let onLine = ref([])
+    let contentInput = ref()
+    let innerRef = ref()
+    let scrollbarRef = ref()
     let consultLawyerList = ref([])
     let chatRecordList = ref([])
     let stat = reactive({
@@ -83,40 +116,107 @@ export default {
       content: "",
       userId: store.state.userId
     })
-
+    //是否在线
+    const isOnline = computed(()=>{
+      return id => {
+        for (let i = 0; i < onLine.value.length; i++) {
+          if (id == onLine.value[i]){
+            return true
+          }
+        }
+        return false
+      }
+    })
+    //打开表情框
+    const openEmoji = () => {
+      isEmoji.value = !isEmoji.value
+    }
+    //添加表情
+    const addEmoji = (key) => {
+      isEmoji.value = false
+      contentInput.value.focus()
+      stat.content += key
+    }
     stat.webSocket = new WebSocket("ws://localhost:8080/websocket/single/" + stat.userId)
-    if (stat.webSocket == null){
+    if (stat.webSocket == null) {
       stat.websocket.onerror = function (event) {
         console.log(event);
         alert("失败");
       };
     }
     stat.webSocket.onopen = function (event) {
-      console.log(event)
-      alert("连接成功");
+      loading.value = true
+      setTimeout(() => {
+        let data = {
+          type: 2,
+          data: {
+            userId: store.state.userId,
+            toUserId: stat.toUserId
+          }
+        }
+        stat.webSocket.send(JSON.stringify(data))
+        stat.webSocket.send(JSON.stringify({type: 6}))
+        loading.value = false
+      }, 2000)
     }
     //接收到消息
-    stat.webSocket.onmessage = function (e) {
+    stat.webSocket.onmessage = async function (e) {
       const data = JSON.parse(e.data);
-      switch (data.type){
-        //历史记录
+      switch (data.type) {
+          //历史记录
         case 2:
           for (let i = 0; i < data.data.length; i++) {
             chatRecordList.value.push(data.data[i])
           }
           break
-        //文字信息
+          //文字信息
         case 3:
-          if (data.toUserId == store.state.userId && data.userId == stat.toUserId) {
-            chatRecordList.value.push(data)
+          let flag = true
+          for (let i = 0; i < consultLawyerList.value.length; i++) {
+            if (consultLawyerList.value[i].userAuthId == data.data.userId) {
+              flag = false
+              break
+            }
           }
+          if (flag) {
+            consultLawyerList.value.push({
+              userAuthId: data.data.userId,
+              avatar: data.data.avatar,
+              name: data.data.name,
+              nickname: data.data.nickname
+            })
+          }
+          if (data.data.toUserId == store.state.userId && data.data.userId == stat.toUserId) {
+            chatRecordList.value.push(data.data)
+          }
+          break
+        //心跳
+        case 6:
+          for (let i = 0; i < data.data.length; i++) {
+            onLine.value.push(data.data[i])
+          }
+          console.log(onLine.value)
       }
+      await nextTick(() => {
+        const max = innerRef.value.clientHeight
+        scrollbarRef.value.setScrollTop(max)
+      })
     }
 
-    const sendMessage = () => {
+    const sendMessage = async () => {
+      //解析表情
+      let reg = /\[.+?\]/g;
+      stat.content = stat.content.replace(reg, function (str) {
+        return (
+            "<img src= '" +
+            EmojiList[str] +
+            "' width='24'height='24' style='margin: 0 1px;vertical-align: text-bottom'/>"
+        );
+      });
       let data = {
         type: 3,
         data: {
+          name: store.state.name,
           nickname: store.state.nickname,
           avatar: store.state.avatar,
           userId: stat.userId,
@@ -132,11 +232,15 @@ export default {
         nickname: data.data.nickname,
         content: data.data.content
       })
+      await nextTick(() => {
+        const max = innerRef.value.clientHeight
+        scrollbarRef.value.setScrollTop(max)
+      })
       stat.content = ""
     }
 
     //更换聊天对象
-    const onLawyerConsult = (item) => {
+    const onLawyerConsult = async (item) => {
       stat.title = item.name
       stat.toUserId = item.userAuthId
       let data = {
@@ -146,25 +250,34 @@ export default {
           toUserId: stat.toUserId
         }
       }
-      stat.webSocket.send(JSON.stringify(data))
+      loading.value = true
+      setTimeout(() => {
+        stat.webSocket.send(JSON.stringify(data))
+        chatRecordList.value = []
+        loading.value = false
+      }, 2000)
+      await nextTick(() => {
+        const max = innerRef.value.clientHeight
+        scrollbarRef.value.setScrollTop(max)
+      })
     }
     const getConsultLawyerList = () => {
       let list = JSON.parse(localStorage.getItem("consult_list")) ? JSON.parse(localStorage.getItem("consult_list")) : []
-      if (list.length != 0){
+      if (list.length != 0) {
         for (let i = 0; i < list.length; i++) {
           consultLawyerList.value.push(list[i])
         }
-        stat.title = consultLawyerList.value[0].name
+        stat.title = consultLawyerList.value[0].name ? consultLawyerList.value[0].name : consultLawyerList.value[0].nickname
         stat.toUserId = consultLawyerList.value[0].userAuthId
-      }else {
-        getConsultUserList().then(res=>{
-          if (res.flag){
+      } else {
+        getConsultUserList().then(res => {
+          if (res.flag) {
             for (let i = 0; i < res.data.length; i++) {
               consultLawyerList.value.push(res.data[i])
             }
-            stat.title = consultLawyerList.value[0].nickname
+            stat.title = consultLawyerList.value[0].name ? consultLawyerList.value[0].name : consultLawyerList.value[0].nickname
             stat.toUserId = consultLawyerList.value[0].userAuthId
-          }else {
+          } else {
             ElMessage.error("出错了！")
           }
         })
@@ -191,14 +304,24 @@ export default {
     onMounted(() => {
       getConsultLawyerList()
     })
-    onUnmounted(()=>{
+    onUnmounted(() => {
       stat.webSocket.close()
-      stat.webSocket.onclose = function () {}
+      stat.webSocket.onclose = function () {
+      }
     })
     return {
       stat,
+      innerRef,
+      isEmoji,
+      scrollbarRef,
+      contentInput,
       consultLawyerList,
       chatRecordList,
+      loading,
+      onLine,
+      isOnline,
+      openEmoji,
+      addEmoji,
       isSelf,
       isMyMessage,
       isMyAvatar,
@@ -223,10 +346,12 @@ export default {
 
   .list_item {
     cursor: pointer;
+    display: flex;
 
     .lawyer_avatar {
       width: 40px;
       height: 40px;
+      margin: auto 0;
 
       img {
         width: 100%;
@@ -238,6 +363,13 @@ export default {
   &:hover {
     background: rgba(0, 0, 0, 0.04);
   }
+}
+
+.chat-container {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 1px 1px 4px 0px;
 }
 
 .chat-main {
@@ -258,6 +390,22 @@ export default {
 
 .chat-room-main {
   min-height: 650px;
+
+  .user-aside {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: -1px -1px 5px 0px;
+  }
+}
+
+.chat-header {
+  display: flex;
+  justify-content: center;
+  font-size: 20px;
+  border-radius: 10px;
+  box-shadow: -1px -2px 5px 0px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-left: none;
 }
 
 .context {
@@ -321,5 +469,40 @@ export default {
 .right-avatar {
   margin-left: 5px;
   order: 1;
+}
+
+.name_message {
+  width: calc(100% - 50px);
+
+  .user_name {
+    font-size: 16px;
+    display: block;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .last_message {
+    font-size: 12px;
+    display: block;
+    color: rgba(0, 0, 0, 0.4);
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.emoji-box {
+  position: absolute;
+  width: 50%;
+  background-color: aliceblue;
+}
+.online{
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  right: 5px;
+  top: 19px;
+  border-radius: 50%;
 }
 </style>
