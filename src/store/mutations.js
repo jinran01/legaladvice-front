@@ -36,6 +36,14 @@ const mutations = {
       commentLikeSet.push(commentId);
     }
   },
+  setLawyerLike(state,userAuthId){
+    let lawyerLikeSet = state.lawyerLikeSet;
+    if (lawyerLikeSet.indexOf(userAuthId) != -1) {
+      lawyerLikeSet.splice(lawyerLikeSet.indexOf(userAuthId), 1);
+    } else {
+      lawyerLikeSet.push(userAuthId);
+    }
+  },
   updateUserInfo(state,data){
     state.nickname = data.nickname
     state.intro = data.intro
@@ -52,11 +60,14 @@ const mutations = {
     state.articleLikeSet = user.articleLikeSet ? user.articleLikeSet : [];
     state.commentLikeSet = user.commentLikeSet ? user.commentLikeSet : [];
     state.talkLikeSet = user.talkLikeSet ? user.talkLikeSet : [];
+    state.lawyerLikeSet = user.lawyerLikeSet ? user.lawyerLikeSet : [];
     state.email = user.email;
     state.loginType = user.loginType;
   },
   logout(state) {
+    state.name = null;
     state.userId = null;
+    state.userInfoId = null;
     state.avatar = null;
     state.nickname = null;
     state.intro = null;
@@ -64,6 +75,7 @@ const mutations = {
     state.articleLikeSet = [];
     state.commentLikeSet = [];
     state.talkLikeSet = [];
+    state.lawyerLikeSet = [];
     state.email = null;
     state.loginType = null;
   },

@@ -25,3 +25,11 @@ export function getConsultUserList(){
     url:'/chat/user/list',
   })
 }
+
+export function changeLikeLawyer(data){
+  return request({
+    url:'/lawyer/like',
+    method:"POST",
+    params: data
+  })
+}

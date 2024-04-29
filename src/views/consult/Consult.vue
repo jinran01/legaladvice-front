@@ -81,7 +81,7 @@
                 ></textarea>
               </div>
             </div>
-            <el-button style="float: right;position: relative;bottom: 10px" @click="sendMessage">发送</el-button>
+            <v-btn style="float: right;position: relative;bottom: 10px" @click="sendMessage">发送</v-btn>
           </div>
         </el-main>
       </el-container>
@@ -140,7 +140,6 @@ export default {
     stat.webSocket = new WebSocket("ws://localhost:8080/websocket/single/" + stat.userId)
     if (stat.webSocket == null) {
       stat.websocket.onerror = function (event) {
-        console.log(event);
         alert("失败");
       };
     }
@@ -195,7 +194,6 @@ export default {
           for (let i = 0; i < data.data.length; i++) {
             onLine.value.push(data.data[i])
           }
-          console.log(onLine.value)
       }
       await nextTick(() => {
         const max = innerRef.value.clientHeight

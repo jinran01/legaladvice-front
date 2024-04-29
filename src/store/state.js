@@ -27,5 +27,6 @@ let state = {
   articleLikeSet: [],
   commentLikeSet: [],
   talkLikeSet: [],
+  lawyerLikeSet: [],
 }
 export default state;

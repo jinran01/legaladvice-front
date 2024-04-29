@@ -136,10 +136,9 @@ canvas {
 p {
   margin: 0 !important;
 }
-
-.login-container {
-  background: #fff !important;
-}
+/*.login-container {*/
+/*  background: #fff !important;*/
+/*}*/
 @media (min-width: 760px) {
   .v-toolbar__content, .v-toolbar__extension {
     padding: 10px 36px;

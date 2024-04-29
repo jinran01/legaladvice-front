@@ -1,21 +1,16 @@
 <template>
   <v-app-bar app :class="`${navClass} ${flag?'fade_in':'fade_out'}`" flat height="60">
-    <!-- 手机端导航栏 -->
-    <div class="d-md-none nav-mobile-container">
-      <div style="margin-left:auto">
-        <a @click="openSearch"><i class="iconfont iconsousuo"/></a>
-        <a @click="openDrawer" style="margin-left:10px;font-size:20px">
-          <i class="iconfont iconhanbao"/>
-        </a>
-      </div>
-    </div>
+<!--    &lt;!&ndash; 手机端导航栏 &ndash;&gt;-->
+<!--    <div class="d-md-none nav-mobile-container">-->
+<!--      <div style="margin-left:auto">-->
+<!--        <a @click="openSearch"><i class="iconfont iconsousuo"/></a>-->
+<!--        <a @click="openDrawer" style="margin-left:10px;font-size:20px">-->
+<!--          <i class="iconfont iconhanbao"/>-->
+<!--        </a>-->
+<!--      </div>-->
+<!--    </div>-->
     <!-- 电脑导航栏 -->
     <div class="d-md-block d-none nav-container">
-      <!--      <div class="float-left blog-title">-->
-      <!--        <router-link to="/">-->
-      <!--          法律咨询与维权公益平台-->
-      <!--        </router-link>-->
-      <!--      </div>-->
       <div class="float-right nav-title">
         <div class="menus-item">
           <a class="menu-btn" @click="openSearch">
@@ -66,35 +61,9 @@
           </v-menu>
         </div>
         <div class="menus-item">
-          <v-menu open-on-hover>
-            <template #activator="{ props }">
-              <a color="primary" v-bind="props">
-                <i class="iconfont iconqita"/> 娱乐
-                <i class="iconfont iconxiangxia2 expand"/>
-              </a>
-            </template>
-            <v-list>
-              <v-list-item>
-                <v-list-item-title>
-                  <router-link to="/albums" style="color: #4c4948">
-                    <i class="iconfont iconxiangce1"/> 相册
-                  </router-link>
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>
-                  <router-link to="/talks" style="color: #4c4948">
-                    <i class="iconfont iconpinglun"/> 说说
-                  </router-link>
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </div>
-        <div class="menus-item">
-          <router-link class="menu-btn" to="/consult">
+          <a class="menu-btn" @click="goConsult">
             <i class="iconfont iconlianjie"/> 咨询
-          </router-link>
+          </a>
         </div>
         <div class="menus-item">
           <router-link class="menu-btn" to="/lawyer">
@@ -188,6 +157,15 @@ export default {
         }
       })
     }
+    //咨询室
+    const goConsult = () => {
+      if (store.state.userId == null){
+        ElMessage.error("请先登录")
+        store.commit("setLoginFlag",true)
+      }else {
+        router.push("/consult")
+      }
+    }
     //开启搜索框
     const openSearch = () => {
 
@@ -218,6 +196,7 @@ export default {
       getScrollTop,
       navClass,
       flag,
+      goConsult,
       logout,
       openLogin,
       openSearch,

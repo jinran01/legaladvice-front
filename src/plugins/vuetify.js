@@ -1,10 +1,7 @@
-// Styles
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 import * as components from 'vuetify/lib/components'
 import * as directives from 'vuetify/lib/directives'
-
-// Vuetify
 import {createVuetify} from 'vuetify'
 
 
@@ -35,6 +32,7 @@ const Darktheme = {
     error: "#FF5252",
     info: "#2196F3",
     success: "#4CAF50",
+    "on-success": "#ffffff",
     warning: "#FFC107",
 
   },
