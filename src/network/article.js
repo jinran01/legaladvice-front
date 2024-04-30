@@ -21,6 +21,12 @@ export function getArticleById(id) {
   })
 }
 
+//文章top10
+export function getArticleTop() {
+  return request({
+    url:`/articles/top`,
+  })
+}
 //文章点赞
 export function articleLike(articleId) {
   return request({

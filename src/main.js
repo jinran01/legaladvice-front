@@ -20,6 +20,7 @@ import {createPinia} from "pinia";
 import store from "./store"
 import {loadFonts} from './plugins/webfontloader'
 import "nprogress/nprogress.css";
+import {report} from "@/network/system";
 loadFonts()
 const app = createApp(App)
 const pinia = createPinia()
@@ -34,3 +35,4 @@ app.use(router)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
 }
+report()

@@ -34,3 +34,9 @@ export function changeUserPhone(data) {
   })
 }
 
+export function report() {
+  return request({
+    url:'/system/report',
+    method: "POST",
+  })
+}

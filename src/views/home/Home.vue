@@ -12,31 +12,6 @@
           {{ obj.output }}
           <span class="typed-cursor">|</span>
         </div>
-        <!-- 联系方式 -->
-<!--        <div class="blog-contact">-->
-<!--          <a-->
-<!--              v-if="isShowSocial('qq')"-->
-<!--              class="mr-5 iconfont iconqq"-->
-<!--              target="_blank"-->
-<!--              :href="-->
-<!--              'http://wpa.qq.com/msgrd?v=3&uin=' +-->
-<!--                blogInfo.websiteConfig.qq +-->
-<!--                '&site=qq&menu=yes'-->
-<!--            "-->
-<!--          />-->
-<!--          <a-->
-<!--              v-if="isShowSocial('github')"-->
-<!--              target="_blank"-->
-<!--              :href="blogInfo.websiteConfig.github"-->
-<!--              class="mr-5 iconfont icongithub"-->
-<!--          />-->
-<!--          <a-->
-<!--              v-if="isShowSocial('gitee')"-->
-<!--              target="_blank"-->
-<!--              :href="blogInfo.websiteConfig.gitee"-->
-<!--              class="iconfont icongitee-fill-round"-->
-<!--          />-->
-<!--        </div>-->
       </div>
       <!-- 向下滚动 -->
       <div class="scroll-down" @click="scrollDown">
@@ -47,145 +22,114 @@
     </div>
     <!-- 主页文章 -->
     <v-row v-infinite-scroll="infiniteHandler" :infinite-scroll-disabled="disabled" class="home-container">
-      <v-col md="9" cols="12">
-          <!-- 说说轮播 -->
-          <v-card class="animated zoomIn" v-if="talkList.length > 0">
-            <Swiper :list="talkList"/>
+      <v-col md="2" cols="12" class="d-md-block d-none">
+        <div class="blog-wrapper">
+          <v-card class="animated zoomIn blog-card mt-5">
+            <div class="top_title">
+              <h3>案件访问量TOP10</h3>
+            </div>
+            <div class="author-wrapper">
+              <div class="article_list" v-for="item in articleTopList" >
+                <div class="article_info" @click="articleDetail(item)">
+                  <div class="article_title">
+                    {{ item.articleTitle }}
+                  </div>
+                  <div class="article_detail">
+                    {{ item.categoryName }} | <span v-for="tag in item.tagNameList" style="margin-right: 5px;">{{ tag }}</span>
+                  </div>
+                </div>
+                <span class="mdi mdi-fire" style="color: red;font-size: 20px;margin: auto"></span>
+              </div>
+            </div>
           </v-card>
-          <v-card
-              class="animated zoomIn article-card"
-              style="border-radius: 12px 8px 8px 12px"
-              v-for="(item, index) of articleList"
-              :key="item.id"
-          >
-            <!-- 文章封面图 -->
-            <div :class="isRight(index)">
+        </div>
+      </v-col>
+      <v-col md="7" cols="12">
+        <!--        &lt;!&ndash; 说说轮播 &ndash;&gt;-->
+        <!--        <v-card class="animated zoomIn" v-if="talkList.length > 0">-->
+        <!--          <Swiper :list="talkList"/>-->
+        <!--        </v-card>-->
+        <v-card
+            class="animated zoomIn article-card"
+            style="border-radius: 12px 8px 8px 12px"
+            v-for="(item, index) of articleList"
+            :key="item.id"
+        >
+          <!-- 文章封面图 -->
+          <div :class="isRight(index)">
+            <router-link :to="'/articles/' + item.id">
+              <img
+                  class="on-hover"
+                  style="width: 100%;height: 100%;"
+                  :src="item.articleCover"
+              />
+            </router-link>
+          </div>
+          <!-- 文章信息 -->
+          <div class="article-wrapper">
+            <div style="line-height:1.4">
               <router-link :to="'/articles/' + item.id">
-                <img
-                    class="on-hover"
-                    style="width: 100%;height: 100%;"
-                    :src="item.articleCover"
-                />
+                {{ item.articleTitle }}
               </router-link>
             </div>
-            <!-- 文章信息 -->
-            <div class="article-wrapper">
-              <div style="line-height:1.4">
-                <router-link :to="'/articles/' + item.id">
-                  {{ item.articleTitle }}
-                </router-link>
-              </div>
-              <div class="article-info">
-                <!-- 是否置顶 -->
-                <span v-if="item.isTop == 1">
+            <div class="article-info">
+              <!-- 是否置顶 -->
+              <span v-if="item.isTop == 1">
                 <span style="color:#ff7242">
                   <i class="iconfont iconzhiding"/> 置顶
                 </span>
                 <span class="separator">|</span>
               </span>
-                <!-- 发表时间 -->
-                <v-icon size="14">mdi-calendar-month-outline</v-icon>
-                {{ formatDate(item.createTime, "YYYY-MM-dd") }}
-                <span class="separator">|</span>
-                <!-- 文章分类 -->
-                <router-link :to="'/categories/' + item.categoryId">
-                  <v-icon size="14">mdi-inbox-full</v-icon>
-                  {{ item.categoryName }}
-                </router-link>
-                <span class="separator">|</span>
-                <!-- 文章标签 -->
-                <router-link
-                    style="display:inline-block"
-                    :to="'/tags/' + tag.id"
-                    class="mr-1"
-                    v-for="tag of item.tagDTOList"
-                    :key="tag.id"
-                >
-                  <v-icon size="14">mdi-tag-multiple</v-icon>
-                  {{ tag.tagName }}
-                </router-link>
-              </div>
-              <!-- 文章内容 -->
-              <div class="article-content">
-                {{ item.articleContent }}
-              </div>
+              <!-- 发表时间 -->
+              <v-icon size="14">mdi-calendar-month-outline</v-icon>
+              {{ formatDate(item.createTime, "YYYY-MM-dd") }}
+              <span class="separator">|</span>
+              <!-- 文章分类 -->
+              <router-link :to="'/categories/' + item.categoryId">
+                <v-icon size="14">mdi-inbox-full</v-icon>
+                {{ item.categoryName }}
+              </router-link>
+              <span class="separator">|</span>
+              <!-- 文章标签 -->
+              <router-link
+                  style="display:inline-block"
+                  :to="'/tags/' + tag.id"
+                  class="mr-1"
+                  v-for="tag of item.tagDTOList"
+                  :key="tag.id"
+              >
+                <v-icon size="14">mdi-tag-multiple</v-icon>
+                {{ tag.tagName }}
+              </router-link>
             </div>
-          </v-card>
-          <p class="loading" v-if="loading">加载中...</p>
-        </v-col>
-      <v-col md="3" cols="12" class="d-md-block d-none">
+            <!-- 文章内容 -->
+            <div class="article-content">
+              {{ item.articleContent }}
+            </div>
+          </div>
+        </v-card>
+        <p class="loading" v-if="loading">加载中...</p>
+      </v-col>
+      <v-col md="3" cols="12" style="max-width: 300px;" class="d-md-block d-none">
         <div class="blog-wrapper">
           <v-card class="animated zoomIn blog-card mt-5">
+            <div class="top_title">
+              <h3>最受欢迎律师TOP5</h3>
+            </div>
             <div class="author-wrapper">
-              <!-- 博主头像 -->
-              <v-avatar size="110">
-                <img
-                    class="author-avatar"
-                    :src="blogInfo.websiteConfig.websiteAvatar"
-                />
-              </v-avatar>
-              <div style="font-size: 1.375rem;margin-top:0.625rem">
-                {{ blogInfo.websiteConfig.websiteAuthor }}
+              <div class="lawyer_list" v-for="item in lawyerTopList">
+                <img class="lawyer_avatar"
+                     :src="item.avatar">
+                <div class="lawyer_info">
+                  <span class="lawyer_name">{{ item.name }}律师</span>
+                  <span class="lawyer_phone">联系方式:{{ item.phone }}</span>
+                </div>
+                <span class="mdi mdi-fire" style="color: red;font-size: 20px;margin: auto"></span>
               </div>
-              <div style="font-size: 0.875rem;">
-                {{ blogInfo.websiteConfig.websiteIntro }}
-              </div>
-            </div>
-            <!-- 博客信息 -->
-            <div class="blog-info-wrapper">
-              <div class="blog-info-data">
-                <router-link to="/archives">
-                  <div style="font-size: 0.875rem">文章</div>
-                  <div style="font-size: 1.25rem">
-                    {{ blogInfo.articleCount }}
-                  </div>
-                </router-link>
-              </div>
-              <div class="blog-info-data">
-                <router-link to="/categories">
-                  <div style="font-size: 0.875rem">分类</div>
-                  <div style="font-size: 1.25rem">
-                    {{ blogInfo.categoryCount }}
-                  </div>
-                </router-link>
-              </div>
-              <div class="blog-info-data">
-                <router-link to="/tags">
-                  <div style="font-size: 0.875rem">标签</div>
-                  <div style="font-size: 1.25rem">{{ blogInfo.tagCount }}</div>
-                </router-link>
+              <div class="top_footer">
+                <span @click="$router.push('/lawyer')">查看更多</span>
               </div>
             </div>
-            <!-- 收藏按钮 -->
-            <a class="collection-btn" @click="tip = true">
-              <v-icon color="#fff" size="18" class="mr-1">mdi-bookmark</v-icon>
-              加入书签
-            </a>
-            <!-- 社交信息 -->
-<!--            <div class="card-info-social">-->
-<!--              <a-->
-<!--                  v-if="isShowSocial('qq')"-->
-<!--                  class="mr-5 iconfont iconqq"-->
-<!--                  target="_blank"-->
-<!--                  :href="-->
-<!--                  'http://wpa.qq.com/msgrd?v=3&uin=' +-->
-<!--                    blogInfo.websiteConfig.qq +-->
-<!--                    '&site=qq&menu=yes'-->
-<!--                "-->
-<!--              />-->
-<!--              <a-->
-<!--                  v-if="isShowSocial('github')"-->
-<!--                  target="_blank"-->
-<!--                  :href="blogInfo.websiteConfig.github"-->
-<!--                  class="mr-5 iconfont icongithub"-->
-<!--              />-->
-<!--              <a-->
-<!--                  v-if="isShowSocial('gitee')"-->
-<!--                  target="_blank"-->
-<!--                  :href="blogInfo.websiteConfig.gitee"-->
-<!--                  class="iconfont icongitee-fill-round"-->
-<!--              />-->
-<!--            </div>-->
           </v-card>
           <!-- 网站信息 -->
           <v-card class="blog-card animated zoomIn mt-5 big">
@@ -217,8 +161,6 @@
         </div>
       </v-col>
     </v-row>
-
-
     <!-- 提示消息 -->
     <v-snackbar v-model="tip" color="#49b1f5" :timeout="1000">
       按CTRL+D 键将本页加入书签
@@ -232,8 +174,9 @@ import EasyTyper from "easy-typer-js";
 import {computed, onMounted, reactive, ref, toRefs} from "vue";
 import store from "@/store";
 
-import {getArticles, getArticlesList} from "@/network/article";
+import {getArticles, getArticlesList, getArticleTop} from "@/network/article";
 import {formatDate} from "@/common/js/formatDate";
+import router from "@/router";
 
 export default {
   components: {
@@ -260,10 +203,20 @@ export default {
     let state = reactive({
       current: 1
     })
-
     let disabled = computed(() => {
       return loading.value
     })
+    let lawyerTopList = ref([])
+    let articleTopList = ref([])
+
+    //文章访问量top10
+    const getArticleTopList = () => {
+      getArticleTop().then(res => {
+        if (res.flag) {
+          articleTopList.value = res.data
+        }
+      })
+    }
     // const getArticleList = () => {
     //   getArticles().then(res => {
     //     let md = require("markdown-it")();
@@ -332,14 +285,15 @@ export default {
       const data = obj;
       const typed = new EasyTyper(data, input, null, null);
     }
-    // const isShowSocial = (type) => {
-    //   return blogInfo.websiteConfig.socialUrlList.indexOf(type) >= 0 ? true : false
-    // }
+    //查看文章详情
+    const articleDetail = (item) => {
+      router.push(`/articles/${item.id}`)
+    }
     //计时器
     const runTime = () => {
       let timeold =
           new Date().getTime() -
-          new Date('2021-01-07').getTime();
+          new Date('2024-04-30').getTime();
       let msPerDay = 24 * 60 * 60 * 1000;
       let daysold = Math.floor(timeold / msPerDay);
       let str = "";
@@ -350,17 +304,22 @@ export default {
       str += day.getSeconds() + "秒";
       time.value = str;
     }
-
+    let getLawyerTop = () => {
+      lawyerTopList.value = store.state.blogInfo.lawyerLikeTop
+    }
     let cover = ref("")
     onMounted(() => {
       let pageList = store.state.blogInfo.pageList
       for (let i = 0; i < pageList.length; i++) {
         if (pageList[i].pageName == "首页") {
           cover.value = "background: url(" + pageList[i].pageCover + ") center center / cover no-repeat";
+          break
         }
       }
       infiniteHandler()
       init()
+      getArticleTopList(),
+          getLawyerTop()
       setInterval(runTime, 1000)
     })
     return {
@@ -368,6 +327,8 @@ export default {
       tip,
       time,
       obj,
+      lawyerTopList,
+      articleTopList,
       infiniteHandler,
       articleList,
       talkList,
@@ -375,113 +336,30 @@ export default {
       cover,
       infiniteLoadingRef,
       formatDate,
+      getLawyerTop,
+      articleDetail,
       disabled,
       loading,
-      // isShowSocial,
       scrollDown,
       isRight,
-      // infiniteHandler
     }
   }
-
-  // data: function() {
-  // methods: {
-
-  //   listHomeTalks() {
-  //     this.axios.get("/api/home/talks").then(({ data }) => {
-  //       this.talkList = data.data;
-  //     });
-  //   },
-  //   scrollDown() {
-  //     window.scrollTo({
-  //       behavior: "smooth",
-  //       top: document.documentElement.clientHeight
-  //     });
-  //   },
-  //   runTime() {
-  //     var timeold =
-  //       new Date().getTime() -
-  //       new Date(this.blogInfo.websiteConfig.websiteCreateTime).getTime();
-  //     var msPerDay = 24 * 60 * 60 * 1000;
-  //     var daysold = Math.floor(timeold / msPerDay);
-  //     var str = "";
-  //     var day = new Date();
-  //     str += daysold + "天";
-  //     str += day.getHours() + "时";
-  //     str += day.getMinutes() + "分";
-  //     str += day.getSeconds() + "秒";
-  //     this.time = str;
-  //   },
-  //   infiniteHandler($state) {
-  //     let md = require("markdown-it")();
-  //     this.axios
-  //       .get("/api/articles", {
-  //         params: {
-  //           current: this.current
-  //         }
-  //       })
-  //       .then(({ data }) => {
-  //         if (data.data.length) {
-  //           // 去除markdown标签
-  //           data.data.forEach(item => {
-  //             item.articleContent = md
-  //               .render(item.articleContent)
-  //               .replace(/<\/?[^>]*>/g, "")
-  //               .replace(/[|]*\n/, "")
-  //               .replace(/&npsp;/gi, "");
-  //           });
-  //           this.articleList.push(...data.data);
-  //           this.current++;
-  //           $state.loaded();
-  //         } else {
-  //           $state.complete();
-  //         }
-  //       });
-  //   }
-  // },
-  // computed: {
-  //   isRight() {
-  //     return function (index) {
-  //       if (index % 2 == 0) {
-  //         return "article-cover left-radius";
-  //       }
-  //       return "article-cover right-radius";
-  //     };
-  //   },
-  //   blogInfo() {
-  //     return this.$store.state.blogInfo;
-  //   },
-  //   isShowSocial() {
-  //     return function (social) {
-  //       return this.blogInfo.websiteConfig.socialUrlList.indexOf(social) != -1;
-  //     };
-  //   },
-  //   cover() {
-  //     var cover = "";
-  //     this.$store.state.blogInfo.pageList.forEach(item => {
-  //       if (item.pageLabel == "home") {
-  //         cover = item.pageCover;
-  //       }
-  //     });
-  //     return "background: url(" + cover + ") center center / cover no-repeat";
-  //   }
-  // },
 };
 </script>
 
-<!--<style lang="stylus">-->
-<!--.typed-cursor-->
-<!--  opacity: 1-->
-<!--  animation: blink 0.7s infinite-->
+<style lang="stylus">
+.typed-cursor
+  opacity: 1
+  animation: blink 0.7s infinite
 
-<!--@keyframes blink-->
-<!--  0%-->
-<!--    opacity: 1-->
-<!--  50%-->
-<!--    opacity: 0-->
-<!--  100%-->
-<!--    opacity: 1-->
-<!--</style>-->
+@keyframes blink
+  0%
+    opacity: 1
+  50%
+    opacity: 0
+  100%
+    opacity: 1
+</style>
 
 <style scoped lang="less">
 
@@ -550,7 +428,7 @@ export default {
   }
 
   .home-container {
-    max-width: 1200px;
+    max-width: 95%;
     margin: calc(100vh - 48px) auto 28px auto;
     padding: 0 5px;
   }
@@ -794,4 +672,86 @@ export default {
   justify-content: center;
   color: #49b1f5
 }
+
+.lawyer_list {
+  margin-top: 10px;
+  display: flex;
+  height: 50px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .lawyer_avatar {
+    width: 40px;
+    height: 40px;
+    float: left;
+    top: 5px;
+    margin: auto 0 auto 5px;
+    border-radius: 50%;
+  }
+
+  .lawyer_info {
+    display: grid;
+    margin-left: 5px;
+
+    .lawyer_name {
+      display: flex;
+      justify-content: left;
+      font-size: 14px;
+    }
+
+    .lawyer_phone {
+      font-size: 12px;
+      color: #4c4948;
+    }
+  }
+}
+
+.top_title {
+  h3 {
+    display: flex;
+    justify-content: center
+  }
+}
+
+.top_footer {
+  margin-top: 10px;
+  font-size: 13px;
+
+  span:hover {
+    cursor: pointer;
+    color: #00a1d6;
+  }
+}
+.article_list{
+  display: flex;
+  margin-top: 10px;
+  height: 50px;
+  border-radius: 8px;
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  .article_info{
+    max-width: 130px;
+    .article_title{
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 14px;
+    }
+    .article_detail{
+      font-size: 12px;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
 </style>

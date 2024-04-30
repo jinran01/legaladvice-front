@@ -116,6 +116,7 @@ export default {
       content: "",
       userId: store.state.userId
     })
+    let onLineInterval;
     //是否在线
     const isOnline = computed(()=>{
       return id => {
@@ -155,6 +156,9 @@ export default {
         }
         stat.webSocket.send(JSON.stringify(data))
         stat.webSocket.send(JSON.stringify({type: 6}))
+        onLineInterval  = setInterval(()=>{
+          stat.webSocket.send(JSON.stringify({type: 6}))
+        },30000)
         loading.value = false
       }, 2000)
     }
@@ -191,6 +195,7 @@ export default {
           break
         //心跳
         case 6:
+          onLine.value = []
           for (let i = 0; i < data.data.length; i++) {
             onLine.value.push(data.data[i])
           }
@@ -301,6 +306,7 @@ export default {
     }
     onMounted(() => {
       getConsultLawyerList()
+      clearInterval(onLineInterval)
     })
     onUnmounted(() => {
       stat.webSocket.close()

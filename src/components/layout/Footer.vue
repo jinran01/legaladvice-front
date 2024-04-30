@@ -24,7 +24,6 @@ import {computed, ref, watch} from "vue";
 export default {
   name: 'Footer',
   setup() {
-    // let blogInfo = store.getters.getBlogInfo
     const blogInfo = computed(()=>{
       return store.getters.getBlogInfo
     })
