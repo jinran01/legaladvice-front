@@ -96,6 +96,7 @@ import {getConsultUserList} from "@/network/lawyer";
 import {ElMessage} from "element-plus";
 import Emoji from "@/components/Emoji";
 import EmojiList from "@/assets/js/emoji";
+import router from "@/router";
 
 export default {
   name: "Consult",
@@ -281,7 +282,8 @@ export default {
             stat.title = consultLawyerList.value[0].name ? consultLawyerList.value[0].name : consultLawyerList.value[0].nickname
             stat.toUserId = consultLawyerList.value[0].userAuthId
           } else {
-            ElMessage.error("出错了！")
+            ElMessage.error("出错了,请选择咨询的律师！")
+            router.push("/lawyer")
           }
         })
       }

@@ -1,7 +1,7 @@
 <template>
   <div class="bullet-container">
-    <div class="sendMessage" >
-      <div class="input" style="margin: auto;border-radius: 35px" >
+    <div class="sendMessage">
+      <div class="input" style="margin: auto;border-radius: 35px">
         <input placeholder="说点什么" @focus="handlerFocus" @blur="handlerBlur" v-model="messageContent">
       </div>
       <el-button
@@ -29,7 +29,7 @@
       >
         开启
       </el-button>
-<!--      <el-button v-if="true" @click="stopped">stopped</el-button>-->
+      <!--      <el-button v-if="true" @click="stopped">stopped</el-button>-->
     </div>
     <!-- @animationend css动画结束后触发-->
     <div v-for="bullet in bullets"
@@ -43,11 +43,11 @@
       <div class="msgInfo" :style="{color:bullet.color}">
         <img :src=bullet.avatar style="width: 30px;height: 30px;border-radius: 30px;">
         {{ bullet.nickname }}:{{ bullet.content }}
-<!--        <div style="position: relative;top: -32px;left: 35px">: {{ bullet.content }}</div>-->
+        <!--        <div style="position: relative;top: -32px;left: 35px">: {{ bullet.content }}</div>-->
       </div>
     </div>
-    <v-snackbar v-model="toast.show" :timeout="2000" :color="toast.color" >
-      <i :class="toast.icon" style="margin-right: 10px;" />
+    <v-snackbar v-model="toast.show" :timeout="2000" :color="toast.color">
+      <i :class="toast.icon" style="margin-right: 10px;"/>
       {{ toast.message }}
     </v-snackbar>
   </div>
@@ -66,8 +66,8 @@ class Bullet {
   content = ''
   color = ''
   track
-
 }
+
 //弹幕轨道
 class Track {
   disabled = false
@@ -82,31 +82,34 @@ export default {
     let tracks = reactive([]);
     let messageContent = ref('')
     let toast = reactive({
-      show:false,
-      color:'#52C41A',
-      icon:'iconfont iconchenggong',
-      message:'感谢您所留下的足迹'
+      show: false,
+      color: '#52C41A',
+      icon: 'iconfont iconchenggong',
+      message: '感谢您所留下的足迹'
     })
     let state = reactive({
       trackCount: 10, //弹幕轨道数
       trackHeight: 56, //轨道高度
       current: 0, //当前弹幕
-      flag:false, //发送弹幕按钮
-      open_close:true  //开启或者清除弹幕按钮
+      flag: false, //发送弹幕按钮
+      open_close: true  //开启或者清除弹幕按钮
     })
-    let color = ['#ff0000','#ffa500','#008000','#0000ff','#ffc0cb','#800080']
+    let color = [
+        '#ff0000', '#ffa500', '#008000', '#0000ff', '#ffc0cb', '#800080',
+      '#5C3317','#9932CD' , '#4D4DFF','#FF2400','#CC3299','#FF1CAE'
+    ]
     let timer = null
     //获取随机颜色
     const getColor = () => {
-      return Math.floor(Math.random()*6)
+      return Math.floor(Math.random() * color.length)
     }
     const handlerFocus = () => {
       state.flag = !state.flag
     }
     const handlerBlur = () => {
-      setTimeout(()=>{
+      setTimeout(() => {
         state.flag = !state.flag
-      },500)
+      }, 500)
     }
     //发送弹幕
     const sendMsg = () => {
@@ -117,8 +120,8 @@ export default {
       data.nickname = '游客'
       data.time = 9
       // toast.show = true
-      addMessage(data).then(res=>{
-        if (res.flag){
+      addMessage(data).then(res => {
+        if (res.flag) {
           toast.show = true
         }
       })
@@ -133,9 +136,9 @@ export default {
       bullet.color = color[getColor()]
       bullet.track = tracks[i]
       bullets.value.push(bullet)
-      if (state.current + 1 >= bulletList.value.length){
+      if (state.current + 1 >= bulletList.value.length) {
         state.current = 0
-      }else {
+      } else {
         state.current = state.current + 1
       }
     }
@@ -191,21 +194,21 @@ export default {
     }
     //获取留言
     const getMessageList = () => {
-      getMessage().then(res=>{
-        if (res.flag){
+      getMessage().then(res => {
+        if (res.flag) {
           bulletList.value = res.data
         }
       })
     }
-    onBeforeUnmount(()=>{
+    onBeforeUnmount(() => {
       timer = clearInterval(timer)
       timer = null
     })
     onMounted(() => {
       getMessageList()
-      setTimeout(()=>{
+      setTimeout(() => {
         auto()
-      },1000)
+      }, 1000)
       for (let i = 0; i < state.trackCount; i++) {
         let track = new Track()
         track.offset = i * state.trackHeight + state.trackHeight
@@ -231,7 +234,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-.sendMessage{
+.sendMessage {
   display: flex;
   position: relative;
   top: 32%;
@@ -239,25 +242,28 @@ export default {
   align-items: center;
   text-align: center;
   width: 300px;
-  .input{
-    input{
+
+  .input {
+    input {
       border: 1px solid #f0f6fc;
       border-radius: 35px;
       height: 35px;
-      outline:none;
+      outline: none;
       padding: 0 10px;
       color: #f0f6fc;
     }
   }
 }
+
 .bullet {
   position: absolute;
   white-space: nowrap;
   //border: 1px solid white;
-  border: 1px rgba(255,255,255,0.1) solid;
+  border: 1px rgba(255, 255, 255, 0.1) solid;
   border-radius: 25px;
-  background-color: rgba(255,255,255,0.2);
-  &:hover{
+  background-color: rgba(255, 255, 255, 0.2);
+
+  &:hover {
     animation-play-state: paused;
     z-index: 9999;
   }
@@ -280,12 +286,14 @@ export default {
   left: 0;
   transform: translate3d(-100%, 0, 0);
 }
-.msgInfo{
+
+.msgInfo {
   width: 100%;
   height: 30px;
   display: flex;
   align-items: center;
 }
+
 @keyframes running {
   from {
     left: 100%;

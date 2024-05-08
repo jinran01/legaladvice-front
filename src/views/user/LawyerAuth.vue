@@ -14,6 +14,26 @@
         </div>
         <el-divider></el-divider>
         <v-row class="info-wrapper">
+          <el-upload
+              action="https://legaladvice.oss-cn-beijing.aliyuncs.com/"
+              :show-file-list="false"
+              :auto-upload="true"
+              :data="ossData"
+              :before-upload="before_upload"
+              :on-success="avatar_success"
+          >
+            <el-image :src="avatar" style="border-radius: 150px;width: 150px;height: 150px">
+              <template #error>
+                <div class="image-slot">
+                  <el-icon>
+                    <Picture />
+                  </el-icon>
+                </div>
+              </template>
+            </el-image>
+          </el-upload>
+        </v-row>
+        <v-row class="info-wrapper">
           <v-col md="6" sm="12" cols="6">
             <v-text-field
                 variant="underlined"
@@ -40,7 +60,6 @@
           <span>实名认证</span>
         </div>
         <el-divider></el-divider>
-
         <v-row class="info-wrapper">
           <v-col md="6" sm="12" cols="6">
             <v-text-field
@@ -167,13 +186,15 @@ import {getPolicy} from "@/network/system";
 import {v4} from "uuid";
 import {getLawyerAuthInfo, lawyerAuth} from "@/network/lawyer";
 import router from "@/router";
+import {Picture, UserFilled} from "@element-plus/icons-vue";
 
 export default {
-  components: {AvatarCropper},
+  components: {Picture, UserFilled, AvatarCropper},
   setup() {
     let stat = reactive({
       idCard:"",
       name:"",
+      avatar:"",
       major:"",
       school:"",
       phone:"",
@@ -191,6 +212,30 @@ export default {
     let idCardList = ref([])
     let lpcList = ref([])
     let lpqcList = ref([])
+    //头像上传前
+    const before_upload = (file) => {
+      let type = file.name.split(".")
+      type = type[type.length - 1]
+      if (file.size > 10 * 1024 * 1024) {
+        ElMessage.error('最大支持 10MB 文件')
+        return Promise.reject('最大支持 10MB 文件')
+      }
+      return new Promise((resolve, reject) => {
+        getPolicy({path: 'avatar'}).then(res => {
+          ossData.signature = res.data.signature
+          ossData.policy = res.data.policy
+          ossData.OSSAccessKeyId = res.data.accessKeyId
+          ossData.key = res.data.dir + v4() + "." + type
+        })
+        setTimeout(() => {
+          resolve(file)
+        }, 2000)
+      })
+    }
+    //头像上传成功回调
+    const avatar_success = () => {
+      stat.avatar = "https://legaladvice.oss-cn-beijing.aliyuncs.com/" + ossData.key
+    }
     //实名认证上传前
     const card_upload = (file) => {
       let type = file.name.split(".")
@@ -288,6 +333,7 @@ export default {
       let data = {
         idCard: stat.idCard,
         name: stat.name,
+        avatar: stat.avatar,
         major: stat.major,
         school: stat.school,
         phone: stat.phone,
@@ -324,7 +370,7 @@ export default {
       lawyerAuth(data).then(res=>{
         if (res.flag){
           ElMessage.success("申请成功,待审核中...")
-          router.push("setting")
+          router.push("/setting")
         }else {
           ElMessage.error("出错了,请重试")
         }
@@ -342,9 +388,10 @@ export default {
     onMounted(()=>{
       getLawyerAuthInfo().then(res=>{
         let arr = []
-        if (res.flag){
+        if (res.flag && res.data != null){
           stat.id = res.data.id
           stat.idCard = res.data.idCard
+          stat.avatar = res.data.avatar
           stat.name = res.data.name
           stat.status = res.data.status
           stat.major = res.data.major
@@ -381,13 +428,15 @@ export default {
       lpqc_upload,
       upload_lpqc_success,
       authentication,
+      before_upload,
+      avatar_success,
     }
   },
 
 };
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .info-title {
   font-size: 1.25rem;
   font-weight: bold;
@@ -398,6 +447,20 @@ export default {
   display: flex;
   align-items: center;
   justify-content: left;
+}
+.image-slot{
+  width: 100%;
+  height: 100%;
+  .el-icon {
+    height: 100%;
+    width: 100%;
+    font-size: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+    &:hover{
+      background-color: rgba(0,0,0,0.05);
+    }
+  }
 }
 
 </style>
