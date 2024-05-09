@@ -111,6 +111,9 @@ export default {
                 ElMessage.success("回复成功!")
               }
               stat.commentContent = ""
+              stat.showReply = false
+              reply.value.style.display = "none"
+              context.emit("reloadReply",stat.index)
             } else {
               ElMessage({
                 type: 'error',
@@ -133,53 +136,6 @@ export default {
       insertReply,
     }
   },
-  // methods: {
-  //   insertReply() {
-  //     //判断登录
-  //     if (!this.$store.state.userId) {
-  //       this.$store.state.loginFlag = true;
-  //       return false;
-  //     }
-  //     if (this.commentContent.trim() == "") {
-  //       this.$toast({ type: "error", message: "回复不能为空" });
-  //       return false;
-  //     }
-  //     //解析表情
-  //     var reg = /\[.+?\]/g;
-  //     this.commentContent = this.commentContent.replace(reg, function(str) {
-  //       return (
-  //         "<img src= '" +
-  //         EmojiList[str] +
-  //         "' width='24'height='24' style='margin: 0 1px;vertical-align: text-bottom'/>"
-  //       );
-  //     });
-  //     const path = this.$route.path;
-  //     const arr = path.split("/");
-  //     var comment = {
-  //       type: this.type,
-  //       replyUserId: this.replyUserId,
-  //       parentId: this.parentId,
-  //       commentContent: this.commentContent
-  //     };
-  //     switch (this.type) {
-  //       case 1:
-  //       case 3:
-  //         comment.topicId = arr[2];
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //     this.commentContent = "";
-  //     this.axios.post("/api/comments", comment).then(({ data }) => {
-  //       if (data.flag) {
-  //         this.$emit("reloadReply", this.index);
-  //         this.$toast({ type: "success", message: "回复成功" });
-  //       } else {
-  //         this.$toast({ type: "error", message: data.message });
-  //       }
-  //     });
-  //   },
-  // }
 };
 </script>
 

@@ -350,7 +350,7 @@ export default {
       }
     }
     let replyRef = ref()
-    //恢复评论
+    //回复评论
     const replyComment = (index, item) => {
       replyRef.value[index].showReply = false;
       replyRef.value.forEach(item => {
@@ -370,12 +370,12 @@ export default {
     const reloadReply = (index) => {
       repliesList(stat.commentList[index].id, {current: paging.value[index].current, size: 5}).then(res => {
         stat.commentList[index].replyCount++
-        if (this.commentList[index].replyCount > 5) {
-          this.$refs.paging[index].style.display = "flex";
+        if (stat.commentList[index].replyCount > 5) {
+          paging.value[index].style.display = "flex";
         }
         check.value[index].style.display = "none";
         replyRef.value[index].$el.style.display = "none";
-        stat.commentList[index].replyDTOList = data.data;
+        stat.commentList[index].replyDTOList = res.data;
       })
     }
     const changeReplyCurrent = (current, index, commentId) => {

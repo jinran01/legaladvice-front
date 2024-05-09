@@ -245,7 +245,7 @@ export default {
 
     //更换聊天对象
     const onLawyerConsult = async (item) => {
-      stat.title = item.name
+      stat.title = item.name ? item.name : item.nickname
       stat.toUserId = item.userAuthId
       let data = {
         type: 2,
