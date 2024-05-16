@@ -56,6 +56,8 @@
 <script>
 import {nextTick, onBeforeUnmount, onMounted, reactive, ref} from "vue";
 import {addMessage, getMessage} from "@/network/message";
+import store from "@/store";
+import {ElMessage} from "element-plus";
 
 //弹幕
 class Bullet {
@@ -114,15 +116,25 @@ export default {
     //发送弹幕
     const sendMsg = () => {
       let data = {}
-      //TODO 用户数据
+      let nickname = store.state.nickname
+      let avatar = store.state.avatar
+      let isMessageReview = store.state.blogInfo.websiteConfig.isMessageReview
       data.messageContent = messageContent.value
-      data.avatar = 'https://legaladvice.oss-cn-beijing.aliyuncs.com/default/db0d7c24-c3a9-4059-b732-deed38246631.png'
-      data.nickname = '游客'
+      data.isReview = isMessageReview
+      data.avatar = avatar != null ? avatar : "https://legaladvice.oss-cn-beijing.aliyuncs.com/default/a5ba0612-36a9-461a-b1fd-24b9c8ed1dde.jpg"
+      data.nickname = nickname != null ? nickname : "游客"
       data.time = 9
-      // toast.show = true
       addMessage(data).then(res => {
         if (res.flag) {
-          toast.show = true
+          if (isMessageReview == 1){
+            ElMessage.success("感谢您留下足迹！")
+          }
+          if (isMessageReview == 0){
+            ElMessage.warning("留言待审核中...")
+          }
+          messageContent.value = ""
+        }else {
+          ElMessage.error("出错了！")
         }
       })
     }

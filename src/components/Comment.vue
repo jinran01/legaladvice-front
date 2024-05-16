@@ -314,8 +314,10 @@ export default {
           //发送请求
           const path = route.path;
           const arr = path.split("/");
+          const isReview = store.state.blogInfo.websiteConfig.isCommentReview == 0;
           const comment = {
             commentContent: stat.commentContent,
+            isReview: isReview ? 0 : 1,
             type: stat.type
           };
           switch (stat.type) {
@@ -332,7 +334,7 @@ export default {
               // 查询最新评论
               stat.current = 1;
               listComments();
-              const isReview = store.state.blogInfo.websiteConfig.isCommentReview == 0;
+              // const isReview = store.state.blogInfo.websiteConfig.isCommentReview == 0;
               if (isReview) {
                 ElMessage.warning("评论成功,待审核中...")
               } else {
