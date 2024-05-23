@@ -34,4 +34,11 @@ export function articleLike(articleId) {
     method: "POST"
   })
 }
-
+//首页搜索文章
+export function searchArticle(data) {
+  return request({
+    url:`/articles/search`,
+    method: "GET",
+    params: data
+  })
+}

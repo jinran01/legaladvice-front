@@ -20,6 +20,9 @@ const mutations = {
   setAvatar(state,data){
     state.avatar = data
   },
+  setSearchFlag(state,data){
+    state.searchFlag = data
+  },
   setArticleLike(state,articleId){
     let articleLikeSet = state.articleLikeSet;
     if (articleLikeSet.indexOf(articleId) != -1) {

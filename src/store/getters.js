@@ -16,6 +16,9 @@ const getters = {
     },
     getPhoneFlag(state){
         return state.phoneFlag
-    }
+    },
+    getSearchFlag(state){
+        return state.searchFlag
+    },
 }
 export default getters;

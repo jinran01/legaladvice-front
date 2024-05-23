@@ -19,6 +19,8 @@
     <EmailModel></EmailModel>
     <!-- 绑定手机号模态框 -->
     <PhoneModel></PhoneModel>
+    <!-- 搜索文章模态框 -->
+    <SearchModel></SearchModel>
     <!-- 聊天室 -->
     <ChatRoom></ChatRoom>
 
@@ -41,12 +43,14 @@ import RegisterModel from "@/components/model/RegisterModel.vue";
 import ForgetModel from "@/components/model/ForgetModel.vue";
 import EmailModel from "@/components/model/EmailModel";
 import PhoneModel from "@/components/model/PhoneModel";
+import SearchModel from "@/components/model/SearchModel";
 
 
 export default {
 
   name: 'App',
   components: {
+    SearchModel,
     PhoneModel,
     EmailModel,
     ForgetModel,

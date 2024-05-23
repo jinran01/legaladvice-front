@@ -5,14 +5,14 @@
       <div class="mb-3">
         <span class="search-title">本地搜索</span>
         <!-- 关闭按钮 -->
-        <v-icon class="float-right" @click="searchFlag = false">
+        <v-icon class="float-right" @click="closeSearch">
           mdi-close
         </v-icon>
       </div>
       <!-- 输入框 -->
       <div class="search-input-wrapper">
         <v-icon>mdi-magnify</v-icon>
-        <input v-model="keywords" placeholder="输入文章标题或内容..." />
+        <input v-model="keywords" placeholder="输入文章标题或内容..." @input="watchInput"/>
       </div>
       <!-- 搜索结果 -->
       <div class="search-result-wrapper">
@@ -28,7 +28,7 @@
             />
           </li>
         </ul>
-        <!-- 搜索结果不存在提示 -->
+<!--         搜索结果不存在提示-->
         <div
           v-show="flag && articleList.length == 0"
           style="font-size:0.875rem"
@@ -41,49 +41,54 @@
 </template>
 
 <script>
+import {computed, ref} from "vue";
+import router from "@/router";
+import store from "@/store";
+import {searchArticle} from "@/network/article";
+
 export default {
-  data: function() {
-    return {
-      keywords: "",
-      articleList: [],
-      flag: false
-    };
-  },
-  methods: {
-    goTo(articleId) {
-      this.$store.state.searchFlag = false;
-      this.$router.push({ path: "/articles/" + articleId });
+  setup(){
+    let keywords = ref("")
+    let articleList = ref([])
+    let flag = ref(false)
+    const goTo = (articleId) => {
+      store.commit("setSearchFlag",false)
+      keywords.value = ""
+      articleList.value = []
+      router.push({ path: "/articles/" + articleId })
     }
-  },
-  computed: {
-    searchFlag: {
-      set(value) {
-        this.$store.state.searchFlag = value;
-      },
-      get() {
-        return this.$store.state.searchFlag;
-      }
-    },
-    isMobile() {
+    const closeSearch = () => {
+      store.commit("setSearchFlag",false)
+    }
+    const searchFlag = computed(()=>{
+      return store.getters.getSearchFlag
+    })
+    const isMobile = computed(()=>{
       const clientWidth = document.documentElement.clientWidth;
       if (clientWidth > 960) {
         return false;
       }
       return true;
+    })
+    const watchInput = () => {
+      searchArticle({keywords:keywords.value}).then(res=>{
+        if (res.flag){
+          articleList.value = res.data
+          flag.value = articleList.value.length == 0
+        }
+      })
+    }
+    return{
+      goTo,
+      watchInput,
+      closeSearch,
+      flag,
+      keywords,
+      searchFlag,
+      isMobile,
+      articleList,
     }
   },
-  watch: {
-    keywords(value) {
-      this.flag = value.trim() != "" ? true : false;
-      this.axios
-        .get("/api/articles/search", {
-          params: { current: 1, keywords: value }
-        })
-        .then(({ data }) => {
-          this.articleList = data.data;
-        });
-    }
-  }
 };
 </script>
 

@@ -168,7 +168,7 @@ export default {
     }
     //开启搜索框
     const openSearch = () => {
-
+      store.commit("setSearchFlag",true)
     }
     const openDrawer = () => {
       store.state.drawer = !store.state.drawer
